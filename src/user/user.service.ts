@@ -18,4 +18,11 @@ export class UserService {
         }
         return null;
     }
+
+    async registerUser({name,email,password}:{name:string,email:string,password:string}){
+        return this.userModel.create({name,email,password:bcrypt.hashSync(password,12)})
+    }
+    // async getUserById(email:string){
+    //     return this.userModel.findOne({where:{email}});
+    // }
 }
