@@ -20,4 +20,3 @@ export class OtherOrder extends Model {
 
 
 
-// write prd for a front end app for cafe managment system: the main points is: ادارة مخزون البطاقات, ادارة اصحاب الاشتركات الشهرية والاسبوعية عرض جميع الجلسات اضافة جلسة واغلاق جلسة عرض طلبات الجلسة قبل اغلاقها امكانية تعديل سعر الطلبات عند الاغلاق, ادارة نقاط البيع 

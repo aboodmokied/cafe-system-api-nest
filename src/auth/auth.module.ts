@@ -5,7 +5,6 @@ import { JwtModule } from '@nestjs/jwt';
 import { LocalStrategy } from './strategies/local.strategy';
 import { UserModule } from '../user/user.module';
 import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
@@ -34,7 +33,7 @@ import { Token } from './token.model';
     SequelizeModule.forFeature([Token])
   ],
   controllers: [AuthController],
-  providers: [AuthService,LocalStrategy,JwtStrategy,JwtAuthGuard],
+  providers: [AuthService,LocalStrategy,JwtAuthGuard],
   exports: [JwtAuthGuard,AuthService]
 })
 export class AuthModule {}

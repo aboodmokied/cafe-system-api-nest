@@ -51,7 +51,7 @@ export class AuthService {
             userId:user.id
         })
         const {id,name,email}=user;
-        return {accessToken,user:{id,name,email}};
+        return {token:accessToken,user:{id,name,email}};
     }
 
     async logout(token:string){
