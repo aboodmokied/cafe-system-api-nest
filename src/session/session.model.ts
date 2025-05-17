@@ -26,6 +26,12 @@ export class Session extends Model {
   })
   isActive:boolean
   
+
+  @Column({
+    type: DataType.STRING,
+    allowNull:false
+  })
+  clientType:string
 }
 
 // TODO: Assosiate with Subscriber and Order 

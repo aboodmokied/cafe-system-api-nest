@@ -7,12 +7,12 @@ import { CloseSessionDto, CreateSessionDto } from './session.dto';
 export class SessionService {
     constructor(@InjectModel(Session) private sessionModel:typeof Session){}
 
-    async createSession({username}:CreateSessionDto){
-        const count=await this.sessionModel.count({where:{isActive:true,username}});
+    async createSession({username,clientType}:CreateSessionDto){
+        const count=await this.sessionModel.count({where:{isActive:true,username,clientType}});
         if(count){
             throw new BadRequestException(`هذا المستخدم لديه جلسة نشطة بالفعل`);
         }
-        return this.sessionModel.create({username});
+        return this.sessionModel.create({username,clientType});
     }
 
     async closeSession({id}:CloseSessionDto){
@@ -23,5 +23,9 @@ export class SessionService {
             throw new BadRequestException('هذه الجلسة مغلقة بالفعل');
         }
         return session.update({isActive:false,endAt:Date.now()});
+    }
+
+    async getSessions(){
+        return this.sessionModel.findAll();
     }
 }

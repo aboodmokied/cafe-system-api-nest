@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsEnum, IsNotEmpty, IsNumber, IsString } from "class-validator";
 
 export class CreateSessionDto{
 
@@ -6,8 +6,11 @@ export class CreateSessionDto{
     @IsNotEmpty()
     username: string;
 
+    @IsString()
+    @IsNotEmpty()
+    clientType:string
     // TODO: Add subscriber and others
-
+ 
 }
 
 export class CloseSessionDto{
