@@ -9,11 +9,10 @@ export class OtherOrder extends Model {
   id: number;
 
   @Column({type:DataType.STRING})
-  description:string;
+  title:string;
 
-  @Column({type:DataType.NUMBER,allowNull:false})
-  price:number;
-
+  // @Column({type:DataType.DOUBLE,allowNull:false})
+  // price:number;
 
 
 }

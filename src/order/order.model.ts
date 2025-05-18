@@ -14,11 +14,11 @@ export class Order extends Model {
   @Column
   sessionId: number;
 
-  @Column(DataType.ENUM('card', 'charging', 'other'))
-  type: 'card' | 'charging' | 'other';
+  @Column(DataType.ENUM('CARD', 'CHARGING', 'OTHER'))
+  type: 'CARD' | 'CHARGING' | 'OTHER';
 
-  @Column
-  totalAmount: number;
+  @Column({type:DataType.DOUBLE,defaultValue:0.0})
+  price:number;
 
   @BelongsTo(() => Session)
   session: Session;

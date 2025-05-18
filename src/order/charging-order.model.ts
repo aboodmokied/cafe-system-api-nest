@@ -11,9 +11,26 @@ export class ChargingOrder extends Model {
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
-    comment: 'Charging duration in minutes',
   })
   durationMinutes: number;
+
+  @Column({
+    type: DataType.DATE,
+    defaultValue:Date.now
+  })
+  startAt: Date;
+
+  @Column({
+    type: DataType.DATE,
+    defaultValue:null
+  })
+  endAt: Date;
+
+  // @Column({
+  //   type: DataType.DOUBLE,
+  //   defaultValue:0.0,
+  // })
+  // price: number;
 }
 
 

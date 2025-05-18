@@ -1,4 +1,5 @@
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, HasMany } from 'sequelize-typescript';
+import { Order } from 'src/order/order.model';
 
 @Table
 export class Session extends Model {
@@ -32,6 +33,8 @@ export class Session extends Model {
     allowNull:false
   })
   clientType:string
-}
 
-// TODO: Assosiate with Subscriber and Order 
+  @HasMany(()=>Order)
+  orders:Order[]
+
+}

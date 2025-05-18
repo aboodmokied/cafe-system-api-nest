@@ -8,11 +8,12 @@ export class CardOrder extends Model {
   @Column({ primaryKey: true })
   id: number;
 
+  // @ForeignKey(() => Session)
   @Column
   cardId: number;
 
-  @Column({type:DataType.NUMBER,allowNull:false})
-  price:number;
+  // @Column({type:DataType.DOUBLE,allowNull:false})
+  // price:number;
 
 }
 

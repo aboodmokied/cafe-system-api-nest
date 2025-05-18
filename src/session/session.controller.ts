@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
 import { SessionService } from './session.service';
 import { CloseSessionDto, CreateSessionDto } from './session.dto';
 import { Response } from 'express';
