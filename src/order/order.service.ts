@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Order } from './order.model';
-import { AddCardOrderDto, AddChargingOrderDto, AddOtherOrderDto, GetOrdersDto } from './order.dto';
+import { AddCardOrderDto, AddChargingOrderDto, AddOtherOrderDto, GetOrdersDto, StopChargingOrderDto } from './order.dto';
 import { CardOrder } from './card-order.model';
 import { ChargingOrder } from './charging-order.model';
 import { OtherOrder } from './other-order.model';
@@ -36,8 +36,17 @@ export class OrderService {
         // create order (sessionId, type=CARD, cardOrder.id)
     };
     async addChargingOrder(addOrderDto:AddChargingOrderDto){
-        // create chargingOrder
-        // create order (sessionId, type=CHARGING, chargingOrder.id)
+        const {sessionId,type}=addOrderDto;
+        const order=await this.orderModel.create({sessionId,type});
+        const chargingOrder=await this.chargingOrderMode.create({id:order.id});
+        order.chargingOrder=chargingOrder;
+        return order;
+    };
+    async stopChargingOrder(stopChargingOrderDto:StopChargingOrderDto){
+        console.log({stopChargingOrderDto});
+        const {orderId,price,endAt}=stopChargingOrderDto;
+        await this.orderModel.update({price},{where:{id:orderId}});
+        await this.chargingOrderMode.update({endAt},{where:{id:orderId}});
     };
     async addOtherOrder(addOrderDto:AddOtherOrderDto){
         const {price,sessionId,title,type}=addOrderDto;
@@ -46,6 +55,7 @@ export class OrderService {
         order.otherOrder=otherOrder;
         return order;
     };
+
     async removeOrder(){};
     async updateOrder(){};
 }

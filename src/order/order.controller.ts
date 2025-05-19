@@ -1,6 +1,6 @@
-import { BadRequestException, Body, Controller, Get, Param, ParseIntPipe, Post, Res } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Res } from '@nestjs/common';
 import { OrderService } from './order.service';
-import { AddCardOrderDto, AddChargingOrderDto, AddOtherOrderDto, GetOrdersDto } from './order.dto';
+import { AddCardOrderDto, AddChargingOrderDto, AddOtherOrderDto, GetOrdersDto, StopChargingOrderDto } from './order.dto';
 import { OrderTypes } from 'src/types';
 import { Response } from 'express';
 
@@ -29,4 +29,10 @@ export class OrderController {
         }
         return res.status(201).send({order});
     }
+
+    @Patch('stop-charging')
+    async stopChargingOrder(@Res() res:Response,@Body() stopChargingOrderDto:StopChargingOrderDto){
+        await this.orderService.stopChargingOrder(stopChargingOrderDto);
+        return res.sendStatus(204);
+    };
 }
