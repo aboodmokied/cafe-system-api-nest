@@ -18,3 +18,26 @@ export class CreateCardDto{
     @IsString()
     speed?:string;
 }
+
+
+export class AddToStockDto{
+    @IsNumber()
+    @IsNotEmpty()
+    cardId:number;
+
+    @IsNumber()
+    @IsNotEmpty()
+    supplierId:number;
+
+    @IsNumber()
+    @IsNotEmpty()
+    qty:number;
+
+    @IsNumber()
+    @IsNotEmpty()
+    totalPrice:number;
+
+    @IsNumber()
+    @IsNotEmpty()
+    paidPrice: number;
+}

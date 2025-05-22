@@ -1,11 +1,12 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Card } from './card.model';
-import { CreateCardDto } from './card.dto';
+import { AddToStockDto, CreateCardDto } from './card.dto';
+import { CardImportService } from 'src/card-import/card-import.service';
 
 @Injectable()
 export class CardService {
-    constructor(@InjectModel(Card) private cardModel:typeof Card){}
+    constructor(@InjectModel(Card) private cardModel:typeof Card,private cardImportService:CardImportService){}
     
     getCards(){
         return this.cardModel.findAll();
@@ -29,5 +30,23 @@ export class CardService {
             return card;
         }
         return null;
+    }
+
+    async addToStock(addToStockDto:AddToStockDto){
+        const card=await this.cardModel.findByPk(addToStockDto.cardId);
+        if(!card){
+            throw new NotFoundException('Card Not Found')
+        }
+        const {cardId,paidPrice,qty,supplierId,totalPrice}=addToStockDto;
+        await this.cardImportService.addImport({
+            cardId,
+            paidPrice,
+            qty,
+            supplierId,
+            totalPrice,
+            qtyBeforeImport:card.qty
+        });
+        const updatedCard=await card.update({qty:card.qty+addToStockDto.qty});
+        return updatedCard;
     }
 }

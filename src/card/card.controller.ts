@@ -1,7 +1,7 @@
-import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Res, UseGuards } from '@nestjs/common';
 import { CardService } from './card.service';
 import { Response } from 'express';
-import { CreateCardDto } from './card.dto';
+import { AddToStockDto, CreateCardDto } from './card.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @UseGuards(JwtAuthGuard) 
@@ -20,5 +20,11 @@ export class CardController {
     async addCard(@Res() res:Response,@Body() createCardDto:CreateCardDto){
         const card=await this.cardService.createCard(createCardDto);
         return res.status(201).send({card});
+    }
+
+    @Patch()
+    async addToStock(@Res() res:Response,@Body() addToStockDto:AddToStockDto){
+        const card=await this.cardService.addToStock(addToStockDto);
+        return res.send({card});
     }
 }
