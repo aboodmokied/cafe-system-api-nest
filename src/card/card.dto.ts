@@ -9,8 +9,8 @@ export class CreateCardDto{
     @IsNotEmpty()
     price:number;
 
-    @IsNumber()
-    qty?:number;
+    // @IsNumber()
+    // qty?:number;
 
     @IsNumber()
     hours:number;
