@@ -1,9 +1,11 @@
-import { BadRequestException, Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Res } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Res, UseGuards } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { AddCardOrderDto, AddChargingOrderDto, AddOtherOrderDto, GetOrdersDto, StopChargingOrderDto } from './order.dto';
 import { OrderTypes } from 'src/types';
 import { Response } from 'express';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('order')
 export class OrderController {
     constructor(private orderService:OrderService){}

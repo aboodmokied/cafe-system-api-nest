@@ -1,6 +1,7 @@
 // card-order.model.ts
 import { Table, Column, Model, ForeignKey, DataType } from 'sequelize-typescript';
 import { Order } from './order.model';
+import { Card } from 'src/card/card.model';
 
 @Table
 export class CardOrder extends Model {
@@ -8,7 +9,7 @@ export class CardOrder extends Model {
   @Column({ primaryKey: true })
   id: number;
 
-  // @ForeignKey(() => Session)
+  @ForeignKey(() => Card)
   @Column
   cardId: number;
 

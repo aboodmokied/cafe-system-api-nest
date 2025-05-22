@@ -5,6 +5,7 @@ export class Card extends Model {
   @Column({
     type: DataType.STRING,
     allowNull: false,
+    unique:true
   })
   label: string;
 
@@ -20,4 +21,20 @@ export class Card extends Model {
     defaultValue:0
   })
   qty: number;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  hours: number;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+    defaultValue:'-'
+  })
+  speed: string;
+
+
+
 }

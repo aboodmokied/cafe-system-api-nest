@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Order } from './order.model';
 import { AddCardOrderDto, AddChargingOrderDto, AddOtherOrderDto, GetOrdersDto, StopChargingOrderDto } from './order.dto';
 import { CardOrder } from './card-order.model';
 import { ChargingOrder } from './charging-order.model';
 import { OtherOrder } from './other-order.model';
+import { CardService } from 'src/card/card.service';
 
 // function getSubOrder(order) {
 //   return order.CardOrder || order.ChargingOrder || order.OtherOrder;
@@ -17,7 +18,8 @@ export class OrderService {
         @InjectModel(Order) private orderModel:typeof Order,
         @InjectModel(CardOrder) private cardOrderModel:typeof CardOrder,
         @InjectModel(ChargingOrder) private chargingOrderMode:typeof ChargingOrder,
-        @InjectModel(OtherOrder) private otherOrderMode:typeof OtherOrder
+        @InjectModel(OtherOrder) private otherOrderMode:typeof OtherOrder,
+        private cardService:CardService
     ){}
     async getOrders(getOrdersDto:GetOrdersDto){
         const orders = await this.orderModel.findAll({
@@ -31,9 +33,15 @@ export class OrderService {
         return orders;
     };
     async addCardOrder(addOrderDto:AddCardOrderDto){
-        // find the card (price)
-        // create cardOrder (price,cardId)
-        // create order (sessionId, type=CARD, cardOrder.id)
+        const {cardId,sessionId,type}=addOrderDto;
+        const card=await this.cardService.giveMeCard(cardId);
+        if(!card){
+            throw new NotFoundException('Card Not Found')    
+        }
+        const order=await this.orderModel.create({sessionId,type,price:card.price});
+        const cardOrder=await this.cardOrderModel.create({id:order.id,cardId:card.id});
+        order.cardOrder=cardOrder;
+        return order;
     };
     async addChargingOrder(addOrderDto:AddChargingOrderDto){
         const {sessionId,type}=addOrderDto;
