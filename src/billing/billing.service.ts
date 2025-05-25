@@ -8,18 +8,20 @@ import { CreateBillingDto } from './billing.dto';
 export class BillingService {
     constructor(@InjectModel(Billing) private billingModel:typeof Billing){}
 
-    async getLatestValidBillingByDay(userId: number): Promise<Billing | null> {
+    async getLatestValidBillingByDay(subscriperId: number,type:'weekly'|'monthly'): Promise<Billing | null> {
         const billing = await this.billingModel.findOne({
-            where: { userId },
+            where: { subscriperId },
             order: [['endDate', 'DESC']]
         });
 
-        if (!billing) return null;
-
-        const today = startOfDay(new Date()); // وقت اليوم = 00:00:00
-        const endDay = startOfDay(new Date(billing.endDate)); // وقت نهاية الدورة
-
-        return endDay > today ? billing : null;
+        if(billing){
+            const today = startOfDay(new Date()); // وقت اليوم = 00:00:00
+            const endDay = startOfDay(new Date(billing.endDate)); // وقت نهاية الدورة
+            if(endDay > today){
+                return billing;
+            }
+        }
+        return this.createNewBilling({subscriperId,type});
     }
 
     async createNewBilling(createBillingDto:CreateBillingDto){
