@@ -9,6 +9,7 @@ import { CardModule } from './card/card.module';
 import { SupplierModule } from './supplier/supplier.module';
 import { CardImportModule } from './card-import/card-import.module';
 import { SubscriperModule } from './subscriper/subscriper.module';
+import { BillingModule } from './billing/billing.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { SubscriperModule } from './subscriper/subscriper.module';
     SupplierModule,
     CardImportModule,
     SubscriperModule,
+    BillingModule,
   ],
 })
 export class AppModule {}

@@ -10,7 +10,8 @@ export class SubscriperController {
     constructor(private subscriperService:SubscriperService){}
 
     @Post()
-    createSubscriper(@Res() res:Response,@Body() createSubscriperDto:CreateSubscriperDto){
-        
+    async createSubscriper(@Res() res:Response,@Body() createSubscriperDto:CreateSubscriperDto){
+        const subscriber=await this.subscriperService.addSubscriper(createSubscriperDto);
+        return res.status(201).send({subscriber});
     }
 }
