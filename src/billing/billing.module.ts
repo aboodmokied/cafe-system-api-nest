@@ -7,6 +7,7 @@ import { Billing } from './billing.model';
 @Module({
   imports:[SequelizeModule.forFeature([Billing])],
   providers: [BillingService],
-  controllers: [BillingController]
+  controllers: [BillingController],
+  exports:[BillingService]
 })
 export class BillingModule {}

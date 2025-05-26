@@ -23,6 +23,12 @@ export class Subscriper extends Model {
   })
   phone: string;
 
+  @Column({
+    type: DataType.ENUM('weekly', 'monthly'),
+    allowNull: false,
+  })
+  type: 'monthly'|'weekly';
+
   
   @HasMany(() => Billing)
   billings: Billing[];

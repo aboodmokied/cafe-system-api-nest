@@ -23,7 +23,7 @@ export class SessionController {
         if(clientType=='GUEST'){
             session=await this.sessionService.createSession(createSessionDto);
         }else if(clientType=='SUBSCRIPER'){
-            session=await this.sessionService.createSession(createSessionDto);
+            session=await this.sessionService.createSubscriperSession(createSessionDto);
         }else{
             throw new BadRequestException([`نوع المستخدم غير مدعوم: ${clientType}`]);
         }

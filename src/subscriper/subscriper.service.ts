@@ -5,14 +5,18 @@ import { CreateSubscriperDto } from './subscriper.dto';
 
 @Injectable()
 export class SubscriperService {
-    constructor(@InjectModel(Subscriper) private subscriperMode:typeof Subscriper){}
+    constructor(@InjectModel(Subscriper) private subscriperModel:typeof Subscriper){}
+
+    async getSubscriperById(subscriperId:number){
+        return this.subscriperModel.findByPk(subscriperId);
+    }
 
     async addSubscriper(createSubscriperDto:CreateSubscriperDto){
         const {username}=createSubscriperDto;
-        const count=await this.subscriperMode.count({where:{username}});
+        const count=await this.subscriperModel.count({where:{username}});
         if(count){
             throw new BadRequestException([`المشترك موجود بالفعل: ${username}`]);
         }
-        return this.subscriperMode.create({...createSubscriperDto});
+        return this.subscriperModel.create({...createSubscriperDto});
     }
 }

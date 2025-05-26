@@ -8,6 +8,7 @@ import { Subscriper } from './subscriper.model';
 @Module({
   imports:[AuthModule,SequelizeModule.forFeature([Subscriper])],
   providers: [SubscriperService],
-  controllers: [SubscriperController]
+  controllers: [SubscriperController],
+  exports:[SubscriperService]
 })
 export class SubscriperModule {}
