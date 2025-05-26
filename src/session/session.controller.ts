@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
 import { SessionService } from './session.service';
 import { CloseSessionDto, CreateSessionDto } from './session.dto';
 import { Response } from 'express';
@@ -18,7 +18,15 @@ export class SessionController {
 
     @Post()
     async startSession(@Res() res:Response,@Body() createSessionDto:CreateSessionDto){
-        const session=await this.sessionService.createSession(createSessionDto);
+        const {clientType}=createSessionDto;
+        let session;
+        if(clientType=='GUEST'){
+            session=await this.sessionService.createSession(createSessionDto);
+        }else if(clientType=='SUBSCRIPER'){
+            session=await this.sessionService.createSession(createSessionDto);
+        }else{
+            throw new BadRequestException([`نوع المستخدم غير مدعوم: ${clientType}`]);
+        }
         return res.status(201).send({session})
     }
 

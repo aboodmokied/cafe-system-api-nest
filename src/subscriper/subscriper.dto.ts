@@ -4,7 +4,7 @@ export class CreateSubscriperDto{
 
     @IsString()
     @IsNotEmpty()
-    name: string;
+    username: string;
 
     @IsEmail()
     @IsNotEmpty()

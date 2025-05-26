@@ -1,4 +1,5 @@
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, HasMany } from 'sequelize-typescript';
+import { Billing } from 'src/billing/billing.model';
 
 @Table
 export class Subscriper extends Model {
@@ -7,7 +8,7 @@ export class Subscriper extends Model {
     allowNull: false,
     unique:true
   })
-  name: string;
+  username: string;
 
   @Column({
     type: DataType.STRING,
@@ -21,5 +22,9 @@ export class Subscriper extends Model {
     allowNull: false,
   })
   phone: string;
+
+  
+  @HasMany(() => Billing)
+  billings: Billing[];
 
 }

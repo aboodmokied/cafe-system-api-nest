@@ -8,10 +8,10 @@ export class SubscriperService {
     constructor(@InjectModel(Subscriper) private subscriperMode:typeof Subscriper){}
 
     async addSubscriper(createSubscriperDto:CreateSubscriperDto){
-        const {name}=createSubscriperDto;
-        const count=await this.subscriperMode.count({where:{name}});
+        const {username}=createSubscriperDto;
+        const count=await this.subscriperMode.count({where:{username}});
         if(count){
-            throw new BadRequestException([`المشترك موجود بالفعل: ${name}`]);
+            throw new BadRequestException([`المشترك موجود بالفعل: ${username}`]);
         }
         return this.subscriperMode.create({...createSubscriperDto});
     }

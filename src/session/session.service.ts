@@ -15,6 +15,18 @@ export class SessionService {
         return this.sessionModel.create({username,clientType});
     }
 
+    async createSubscriperSession(createSessionDto:CreateSessionDto){
+        const {clientType,username,subscriperId}=createSessionDto;
+        if(!subscriperId){
+            throw new BadRequestException(['subscriperId required']);
+        }
+        const count=await this.sessionModel.count({where:{isActive:true,subscriperId,clientType}});
+        if(count){
+            throw new BadRequestException([`هذا المستخدم لديه جلسة نشطة بالفعل`]);
+        }
+        const session=await this.sessionModel.create({username,clientType,subscriperId});
+    }
+
     async closeSession({id}:CloseSessionDto){
         const session=await this.sessionModel.findByPk(id);
         if(!session){

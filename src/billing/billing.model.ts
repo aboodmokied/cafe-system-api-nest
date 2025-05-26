@@ -5,7 +5,9 @@ import {
   DataType,
   ForeignKey,
   BelongsTo,
+  HasMany,
 } from 'sequelize-typescript';
+import { Session } from 'src/session/session.model';
 import { Subscriper } from 'src/subscriper/subscriper.model';
 
 @Table({ tableName: 'billing' })
@@ -28,4 +30,7 @@ export class Billing extends Model {
 
   @Column({ type: DataType.BOOLEAN, defaultValue: false })
   isPaid: boolean;
+
+  @HasMany(()=>Session)
+  sessions:Session[];
 }

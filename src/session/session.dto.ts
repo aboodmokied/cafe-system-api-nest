@@ -9,7 +9,9 @@ export class CreateSessionDto{
     @IsString()
     @IsNotEmpty()
     clientType:string
-    // TODO: Add subscriber and others
+    
+    @IsNumber()
+    subscriperId?: number;
  
 }
 
