@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Session } from './session.model';
 import { CloseSessionDto, CreateSessionDto } from './session.dto';
@@ -32,12 +32,19 @@ export class SessionService {
         }
         // get the subscriper
         const subscriper=await this.subscriperService.getSubscriperById(subscriperId);
-        if(subscriper){
-            // get valid billing
-            const validSubscriperBilling=await this.billingService.getLatestValidBillingByDay(subscriperId,subscriper.type);
-            
+        if(!subscriper){
+            throw new NotFoundException('subscriper not found');
         }
-        
+        // get valid billing
+        const validSubscriperBilling=await this.billingService.getLatestValidBillingByDay(subscriperId,subscriper.type);
+        // create session   
+        const session=await this.sessionModel.create({
+            clientType,
+            username,
+            subscriperId,
+            billingId:validSubscriperBilling!.id
+        });
+        return session;
     }
 
     async closeSession({id}:CloseSessionDto){
