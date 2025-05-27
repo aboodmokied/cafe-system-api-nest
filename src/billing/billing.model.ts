@@ -10,7 +10,7 @@ import {
 import { Session } from 'src/session/session.model';
 import { Subscriper } from 'src/subscriper/subscriper.model';
 
-@Table({ tableName: 'billing' })
+@Table({ tableName: 'billings' })
 export class Billing extends Model {
   @ForeignKey(() => Subscriper)
   @Column({ type: DataType.INTEGER })

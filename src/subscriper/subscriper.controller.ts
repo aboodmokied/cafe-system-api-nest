@@ -1,10 +1,10 @@
-import { BadRequestException, Body, Controller, Get, Param, Post, Res, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, ParseIntPipe, Post, Res, UseGuards } from '@nestjs/common';
 import { SubscriperService } from './subscriper.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Response } from 'express';
 import { CreateSubscriperDto } from './subscriper.dto';
 
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
 @Controller('subscriper')
 export class SubscriperController {
     constructor(private subscriperService:SubscriperService){}
@@ -13,6 +13,12 @@ export class SubscriperController {
     async getSubscripers(@Res() res:Response){
         const subscripers= await this.subscriperService.allSubscripers();
         return res.send({subscripers});
+    }
+
+    @Get('report/:id')
+    async getSubscriperReport(@Res() res:Response,@Param('id',ParseIntPipe) id:number){
+        const subscriper= await this.subscriperService.getSubscriperReport(id);
+        return res.send({subscriper});
     }
     
     @Get(':username')

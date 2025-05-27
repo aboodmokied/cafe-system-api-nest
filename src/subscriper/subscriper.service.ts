@@ -2,6 +2,10 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Subscriper } from './subscriper.model';
 import { CreateSubscriperDto } from './subscriper.dto';
+import { Billing } from 'src/billing/billing.model';
+import { Session } from 'src/session/session.model';
+import { Order } from 'src/order/order.model';
+import { Sequelize, fn, col, literal } from 'sequelize';
 
 @Injectable()
 export class SubscriperService {
@@ -30,5 +34,45 @@ export class SubscriperService {
             throw new BadRequestException([`الايميل مستخدم مسبقاً للمشترك: ${findByEmail.username}`]);
         }
         return this.subscriperModel.create({...createSubscriperDto});
+    }
+
+    async getSubscriperReport(subscriberId:number){
+        return this.subscriperModel.findOne({
+            where: { id:subscriberId },
+            include: [
+            {
+                model: Billing,
+                include: [
+                {
+                    model: Session,
+                    include: [
+                    {
+                        model: Order,
+                        attributes: [],
+                    },
+                    ],
+                    // attributes: ['id'],
+                },
+                ],
+                // attributes: ['id'],
+            },
+            ],
+            attributes: {
+            include: [
+                [
+                    literal(`(
+                        SELECT COALESCE(SUM(orders.price), 0)
+                        FROM billings
+                        JOIN sessions ON sessions.billingId = billings.id
+                        JOIN orders ON orders.sessionId = sessions.id
+                        WHERE billings.subscriperId = Subscriper.id
+                    )`),
+                    'totalPrice',
+                ],
+            ],
+            },
+            raw: false,
+            subQuery: false,
+        });
     }
 }
