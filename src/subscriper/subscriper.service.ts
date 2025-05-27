@@ -20,10 +20,14 @@ export class SubscriperService {
     }
 
     async addSubscriper(createSubscriperDto:CreateSubscriperDto){
-        const {username}=createSubscriperDto;
-        const count=await this.subscriperModel.count({where:{username}});
-        if(count){
+        const {username,email}=createSubscriperDto;
+        const countByName=await this.subscriperModel.count({where:{username}});
+        if(countByName){
             throw new BadRequestException([`المشترك موجود بالفعل: ${username}`]);
+        }
+        const findByEmail=await this.subscriperModel.findOne({where:{email}});
+        if(findByEmail){
+            throw new BadRequestException([`الايميل مستخدم مسبقاً للمشترك: ${findByEmail.username}`]);
         }
         return this.subscriperModel.create({...createSubscriperDto});
     }
