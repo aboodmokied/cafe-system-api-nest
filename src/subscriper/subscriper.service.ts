@@ -7,8 +7,16 @@ import { CreateSubscriperDto } from './subscriper.dto';
 export class SubscriperService {
     constructor(@InjectModel(Subscriper) private subscriperModel:typeof Subscriper){}
 
+    async allSubscripers(){
+        return this.subscriperModel.findAll();
+    }
+
     async getSubscriperById(subscriperId:number){
         return this.subscriperModel.findByPk(subscriperId);
+    }
+
+    async getSubscriperByUsername(username:string){
+        return this.subscriperModel.findOne({where:{username}});
     }
 
     async addSubscriper(createSubscriperDto:CreateSubscriperDto){
