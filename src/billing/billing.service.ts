@@ -46,46 +46,43 @@ export class BillingService {
         });
     }
 
+    async updateBillingTotalAmount(billingId:number,amount:number,action:'INC'|'DEC'){
+        if(action=='INC'){
+            await this.billingModel.increment('totalAmount',{
+                by:amount,
+                where:{id:billingId}
+            })
+        }else{
+            await this.billingModel.decrement('totalAmount',{
+                by:amount,
+                where:{id:billingId}
+            })
+        }
+    }
+
     async billingPayment(billingPaymentDto:BillingPaymentDto){
         const {billingId,amount}=billingPaymentDto;
-        const billingWithTotal=await this.billingModel.findOne({
-            where:{id:billingId},
-            attributes: {
-                include: [
-                    [
-                    literal(`(
-                        SELECT COALESCE(SUM(orders.price), 0)
-                        FROM sessions
-                        JOIN orders ON orders.sessionId = sessions.id
-                        WHERE sessions.billingId = Billing.id
-                    )`),
-                    'totalPrice'
-                    ]
-                ]
-            },
-        })
-        if(!billingWithTotal){
+        const billing=await this.billingModel.findByPk(billingId);
+        if(!billing){
             throw new NotFoundException('billing not found');
         }
-        // turn the result into js object
-        const billing:BillingWithTotal=billingWithTotal.get({ plain: true });
         // check if already paid
-        if(billing.paidAmount==billing.totalPrice){
+        if(billing.isPaid){
             throw new BadRequestException(['الفاتورة مسددة بالفعل']);
         }
         // check the amount over than the required amount
         const temp=billing.paidAmount+amount;
-        if(temp>billing.totalPrice){
+        if(temp>billing.totalAmount){
             throw new BadRequestException(['المبلغ المدخل اكبر من المبلغ المطلوب']);
-        }else if(temp==billing.totalPrice){
-            billingWithTotal.isPaid=true;
+        }else if(temp==billing.totalAmount){
+            billing.isPaid=true;
         }
         // update paid amount
-        billingWithTotal.paidAmount=temp;
-        billingWithTotal.save();
+        billing.paidAmount=temp;
+        billing.save();
 
         // TODO: add incomes transaction
         
-        return billingWithTotal;
+        return billing;
     }
 }

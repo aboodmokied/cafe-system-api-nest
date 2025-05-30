@@ -10,6 +10,7 @@ import { SubscriperModule } from 'src/subscriper/subscriper.module';
 @Module({
   imports:[SequelizeModule.forFeature([Session]),AuthModule,BillingModule,SubscriperModule],
   controllers: [SessionController],
-  providers: [SessionService]
+  providers: [SessionService],
+  exports:[SessionService]
 })
 export class SessionModule {}

@@ -61,6 +61,14 @@ export class SessionService {
         return session.update({isActive:false,endAt:Date.now()});
     }
 
+    async getSessionBillingId(sessionId:number){
+        const session=await this.sessionModel.findByPk(sessionId,{
+            attributes:['billingId']
+        })
+        const {billingId}=session as any;
+        return billingId;
+    }
+
     async getSessions(){
         return this.sessionModel.findAll();
     }

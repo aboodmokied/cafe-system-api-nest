@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Subscriper } from './subscriper.model';
 import { CreateSubscriperDto } from './subscriper.dto';
@@ -37,6 +37,12 @@ export class SubscriperService {
     }
 
     async getSubscriperReport(subscriberId:number){
+        const subscriper=await this.subscriperModel.findByPk(subscriberId,{
+            include:[]
+        });
+        if(!subscriper){
+            throw new NotFoundException('subscriper not found');
+        }
         return this.subscriperModel.findOne({
             where: { id:subscriberId },
             include: [
@@ -46,41 +52,19 @@ export class SubscriperService {
                 include: [
                 {
                     model: Session,
-                    include: [
-                    {
-                        model: Order,
-                        attributes: [],
-                    },
-                    ],
-                    // attributes: ['id'],
                 },
                 ],
-                attributes: {
-                    include: [
-                        [
-                        literal(`(
-                            SELECT COALESCE(SUM(orders.price), 0)
-                            FROM sessions
-                            JOIN orders ON orders.sessionId = sessions.id
-                            WHERE sessions.billingId = billings.id
-                        )`),
-                        'totalPrice'
-                        ]
-                    ]
-                },
             },
             ],
             attributes: {
             include: [
                 [
                     literal(`(
-                        SELECT COALESCE(SUM(orders.price), 0)
+                        SELECT COALESCE(SUM(totalAmount - paidAmount), 0)
                         FROM billings
-                        JOIN sessions ON sessions.billingId = billings.id
-                        JOIN orders ON orders.sessionId = sessions.id
                         WHERE billings.subscriperId = Subscriper.id AND billings.isPaid = false
                     )`),
-                    'totalPrice',
+                    'subscriperTotalAmount',
                 ],
             ],
             },

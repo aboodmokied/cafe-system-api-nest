@@ -8,9 +8,11 @@ import { ChargingOrder } from './charging-order.model';
 import { OtherOrder } from './other-order.model';
 import { AuthModule } from 'src/auth/auth.module';
 import { CardModule } from 'src/card/card.module';
+import { BillingModule } from 'src/billing/billing.module';
+import { SessionModule } from 'src/session/session.module';
 
 @Module({
-  imports:[AuthModule,CardModule,SequelizeModule.forFeature([Order,CardOrder,ChargingOrder,OtherOrder])],
+  imports:[AuthModule,CardModule,BillingModule,SessionModule,SequelizeModule.forFeature([Order,CardOrder,ChargingOrder,OtherOrder])],
   providers: [OrderService],
   controllers: [OrderController]
 })

@@ -21,7 +21,7 @@ export class Order extends Model {
   price:number;
 
   @BelongsTo(() => Session)
-  session: Session;
+  session: Promise<Session>;
 
   @HasOne(() => CardOrder)
   cardOrder: CardOrder;

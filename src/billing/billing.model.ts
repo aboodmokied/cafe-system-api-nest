@@ -29,6 +29,9 @@ export class Billing extends Model {
   type: 'weekly' | 'monthly';
 
   @Column({ type: DataType.DOUBLE, defaultValue: 0.0 })
+  totalAmount: number;
+
+  @Column({ type: DataType.DOUBLE, defaultValue: 0.0 })
   paidAmount: number;
   
   @Column({ type: DataType.BOOLEAN, defaultValue: false })
