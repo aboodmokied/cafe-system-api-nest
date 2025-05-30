@@ -37,6 +37,10 @@ export class SessionService {
         }
         // get valid billing
         const validSubscriperBilling=await this.billingService.getLatestValidBillingByDay(subscriperId,subscriper.type);
+        if(validSubscriperBilling?.isPaid){
+            validSubscriperBilling.isPaid=false;
+            await validSubscriperBilling.save();
+        }
         // create session   
         const session=await this.sessionModel.create({
             clientType,

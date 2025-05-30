@@ -28,9 +28,14 @@ export class Billing extends Model {
   @Column({ type: DataType.ENUM('weekly', 'monthly'), allowNull: false })
   type: 'weekly' | 'monthly';
 
+  @Column({ type: DataType.DOUBLE, defaultValue: 0.0 })
+  paidAmount: number;
+  
   @Column({ type: DataType.BOOLEAN, defaultValue: false })
   isPaid: boolean;
 
   @HasMany(()=>Session)
   sessions:Session[];
 }
+
+        

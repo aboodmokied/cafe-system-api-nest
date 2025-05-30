@@ -1,3 +1,4 @@
+import { IsNotEmpty, IsNumber } from "class-validator";
 
 export class CreateBillingDto{
 
@@ -8,3 +9,13 @@ export class CreateBillingDto{
 
 }
 
+
+export class BillingPaymentDto{
+    @IsNotEmpty()
+    @IsNumber()
+    billingId:number;
+
+    @IsNotEmpty()
+    @IsNumber()
+    amount:number
+}
