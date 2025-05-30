@@ -42,6 +42,7 @@ export class SubscriperService {
             include: [
             {
                 model: Billing,
+                order: [['startDate', 'DESC']],
                 include: [
                 {
                     model: Session,
@@ -54,7 +55,19 @@ export class SubscriperService {
                     // attributes: ['id'],
                 },
                 ],
-                // attributes: ['id'],
+                attributes: {
+                    include: [
+                        [
+                        literal(`(
+                            SELECT COALESCE(SUM(orders.price), 0)
+                            FROM sessions
+                            JOIN orders ON orders.sessionId = sessions.id
+                            WHERE sessions.billingId = billings.id
+                        )`),
+                        'totalPrice'
+                        ]
+                    ]
+                },
             },
             ],
             attributes: {
@@ -65,7 +78,7 @@ export class SubscriperService {
                         FROM billings
                         JOIN sessions ON sessions.billingId = billings.id
                         JOIN orders ON orders.sessionId = sessions.id
-                        WHERE billings.subscriperId = Subscriper.id
+                        WHERE billings.subscriperId = Subscriper.id AND billings.isPaid = false
                     )`),
                     'totalPrice',
                 ],

@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Param, ParseIntPipe, Post, Res, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, NotFoundException, Param, ParseIntPipe, Post, Res, UseGuards } from '@nestjs/common';
 import { SubscriperService } from './subscriper.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Response } from 'express';
@@ -15,9 +15,12 @@ export class SubscriperController {
         return res.send({subscripers});
     }
 
-    @Get('report/:id')
+    @Get(':id/report')
     async getSubscriperReport(@Res() res:Response,@Param('id',ParseIntPipe) id:number){
         const subscriper= await this.subscriperService.getSubscriperReport(id);
+        if(!subscriper){
+            throw new NotFoundException('subscriper not found');
+        }
         return res.send({subscriper});
     }
     
