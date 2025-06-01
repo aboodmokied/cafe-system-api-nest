@@ -4,6 +4,8 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Revenue } from './revenue.model';
 import { SubscriperRevenue } from './subscriper-revenue.model';
 import { GuestRevenue } from './guest-revenue.model';
+import { Op } from 'sequelize';
+import { endOfDay, startOfDay } from 'date-fns';
 
 @Injectable()
 export class RevenueService {
@@ -51,14 +53,71 @@ export class RevenueService {
     };
     
 
+    async getRevenuesByDate(startDate?: Date, endDate?: Date) {
+        const whereClause: any = {};
+        if (startDate && endDate) {
+            whereClause.date = {
+            [Op.between]: [startDate, endDate],
+            };
+        } else if (startDate) {
+            whereClause.date = {
+            [Op.gte]: startDate,
+            };
+        } else if (endDate) {
+            whereClause.date = {
+            [Op.lte]: endDate,
+            };
+        }
 
-    async getRevenuesByDate(){
-        // create it
-    };
+        const revenues = await this.revenueModel.findAll({
+            where: whereClause,
+            include: [
+            { model: GuestRevenue, required: false },
+            { model: SubscriperRevenue, required: false },
+            //TODO: { model: PointRevenue, required: false },
+            ],
+            order: [['date', 'DESC']],
+        });
+
+        return revenues;
+    }
+
+
+    async getRevenuesBySpecificDay(date: Date) {
+        const start = startOfDay(date);
+        const end = endOfDay(date);
+
+        const revenues = await this.revenueModel.findAll({
+            where: {
+            date: {
+                [Op.between]: [start, end],
+            },
+            },
+            include: [
+            { model: GuestRevenue, required: false },
+            { model: SubscriperRevenue, required: false },
+            //TODO: { model: PointRevenue, required: false },
+            ],
+            order: [['date', 'DESC']],
+        });
+
+        return revenues;
+    }
+
     
-    async getRevenuesByUser(){
-        // create it
-    };
+    async getRevenuesByUser(userId: number) {
+        const revenues = await this.revenueModel.findAll({
+            where: { userId },
+            include: [
+            { model: SubscriperRevenue, required: false },
+            { model: GuestRevenue, required: false },
+            //TODO: { model: PointRevenue, required: false },
+            ],
+            order: [['date', 'DESC']],
+        });
+
+        return revenues;
+    }
 
 
 }
