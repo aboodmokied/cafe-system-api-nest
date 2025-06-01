@@ -1,6 +1,6 @@
 // order.model.ts
 import { Table, Column, Model, DataType, ForeignKey } from 'sequelize-typescript';
-import { Reveneue } from './revenue.model';
+import { Revenue } from './revenue.model';
 import { Session } from 'src/session/session.model';
 
 
@@ -8,8 +8,8 @@ import { Session } from 'src/session/session.model';
     tableName: 'guest_revenues',
     timestamps: true,
 })
-export class GuestReveneue extends Model {
-  @ForeignKey(() => Reveneue)
+export class GuestRevenue extends Model {
+  @ForeignKey(() => Revenue)
   @Column({ primaryKey: true })
   id: number;
 

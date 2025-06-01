@@ -1,7 +1,7 @@
 // order.model.ts
 import { Table, Column, Model, DataType, HasOne } from 'sequelize-typescript';
-import { SubscriperReveneue } from './subscriper-revenue.model';
-import { GuestReveneue } from './guest-revenue.model';
+import { SubscriperRevenue } from './subscriper-revenue.model';
+import { GuestRevenue } from './guest-revenue.model';
 
 
 @Table({
@@ -9,7 +9,7 @@ import { GuestReveneue } from './guest-revenue.model';
     timestamps: true,
     createdAt: 'date',
 })
-export class Reveneue extends Model {
+export class Revenue extends Model {
   @Column({ primaryKey: true, autoIncrement: true })
   id: number;
 
@@ -25,10 +25,10 @@ export class Reveneue extends Model {
   @Column({type:DataType.DOUBLE,allowNull:false})
   amount:number;
 
-  @HasOne(() => SubscriperReveneue)
-  subscriperRevenue: SubscriperReveneue;
+  @HasOne(() => SubscriperRevenue)
+  subscriperRevenue: SubscriperRevenue;
 
-  @HasOne(() => GuestReveneue)
-  guestReveneue: GuestReveneue;
+  @HasOne(() => GuestRevenue)
+  guestRevenue: GuestRevenue;
 
 }
