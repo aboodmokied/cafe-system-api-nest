@@ -7,6 +7,9 @@ import {
   IsDefined,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { Billing } from 'src/billing/billing.model';
+import { ExistsInDb } from 'src/validation/exists-in-db.validator';
+import { Subscriper } from 'src/subscriper/subscriper.model';
 
 class AddRevenueDto {
   @IsEnum(['GUEST', 'SUBSCRIPER', 'POINT'])
@@ -21,7 +24,7 @@ class AddRevenueDto {
 
   @IsOptional()
   @IsNumber()
-  userId?: number;
+  userId: number;
 }
 
 export class AddSubscriperRevenueDto extends AddRevenueDto {
@@ -31,10 +34,12 @@ export class AddSubscriperRevenueDto extends AddRevenueDto {
 
   @IsDefined()
   @IsNumber()
+  @ExistsInDb(Billing, 'id', { message: 'Billing ID does not exist' })
   billingId: number;
 
   @IsDefined()
   @IsNumber()
+  @ExistsInDb(Subscriper, 'id', { message: 'Subscriper ID does not exist' })
   subscriperId: number;
 }
 

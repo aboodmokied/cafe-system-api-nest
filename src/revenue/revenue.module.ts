@@ -1,9 +1,16 @@
 import { Module } from '@nestjs/common';
 import { RevenueController } from './revenue.controller';
 import { RevenueService } from './revenue.service';
+import { Sequelize } from 'sequelize';
+import { SequelizeModule } from '@nestjs/sequelize';
+import { Revenue } from './revenue.model';
+import { SubscriperRevenue } from './subscriper-revenue.model';
+import { GuestRevenue } from './guest-revenue.model';
 
 @Module({
+  imports:[SequelizeModule.forFeature([Revenue,SubscriperRevenue,GuestRevenue])],
   controllers: [RevenueController],
-  providers: [RevenueService]
+  providers: [RevenueService],
+  exports:[RevenueService]
 })
 export class RevenueModule {}

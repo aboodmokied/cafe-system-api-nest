@@ -19,7 +19,7 @@ export class Revenue extends Model {
    })  
   type: 'GUEST' | 'SUBSCRIPER' | 'POINT';
 
-  @Column
+  @Column({type:DataType.NUMBER,allowNull:true})
   userId: number; // This will refer to either Subscriper or SalesPoint depending on type
 
   @Column({type:DataType.DOUBLE,allowNull:false})
