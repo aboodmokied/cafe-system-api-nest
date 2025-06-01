@@ -4,12 +4,16 @@ import { Billing } from './billing.model';
 import { startOfDay } from 'date-fns';
 import { BillingPaymentDto, CreateBillingDto } from './billing.dto';
 import { literal } from 'sequelize';
+import { RevenueService } from 'src/revenue/revenue.service';
 
 type BillingWithTotal = Billing & { totalPrice: number };
 
 @Injectable()
 export class BillingService {
-    constructor(@InjectModel(Billing) private billingModel:typeof Billing){}
+    constructor(
+        @InjectModel(Billing) private billingModel:typeof Billing,
+        private revenueService:RevenueService
+    ){}
 
     async getLatestValidBillingByDay(subscriperId: number,type:'weekly'|'monthly'): Promise<Billing | null> {
         const billing = await this.billingModel.findOne({
@@ -81,8 +85,15 @@ export class BillingService {
         billing.paidAmount=temp;
         billing.save();
 
-        // TODO: add incomes transaction
-        
+        // record a revenue transaction
+        await this.revenueService.addSubscriperRevenue({
+            type:'SUBSCRIPER',
+            amount,
+            billingId,
+            subscriperId:billing.subscriperId,
+            date:new Date(),
+        });
+
         return billing;
     }
 }

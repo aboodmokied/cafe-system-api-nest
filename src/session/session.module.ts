@@ -6,9 +6,11 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { Session } from './session.model';
 import { BillingModule } from 'src/billing/billing.module';
 import { SubscriperModule } from 'src/subscriper/subscriper.module';
+import { RevenueModule } from 'src/revenue/revenue.module';
+import { Order } from 'src/order/order.model';
 
 @Module({
-  imports:[SequelizeModule.forFeature([Session]),AuthModule,BillingModule,SubscriperModule],
+  imports:[SequelizeModule.forFeature([Session,Order]),AuthModule,BillingModule,SubscriperModule,RevenueModule],
   controllers: [SessionController],
   providers: [SessionService],
   exports:[SessionService]

@@ -12,61 +12,61 @@ import { ExistsInDb } from 'src/validation/exists-in-db.validator';
 import { Subscriper } from 'src/subscriper/subscriper.model';
 
 class AddRevenueDto {
-  @IsEnum(['GUEST', 'SUBSCRIPER', 'POINT'])
+//   @IsEnum(['GUEST', 'SUBSCRIPER', 'POINT'])
   type: 'GUEST' | 'SUBSCRIPER' | 'POINT';
 
-  @IsDate()
-  @Type(() => Date)
+//   @IsDate()
+//   @Type(() => Date)
   date: Date;
 
-  @IsNumber()
+//   @IsNumber()
   amount: number;
 
-  @IsOptional()
-  @IsNumber()
-  userId: number;
+//   @IsOptional()
+//   @IsNumber()
+  userId?: number;
 }
 
 export class AddSubscriperRevenueDto extends AddRevenueDto {
-  @IsDefined()
-  @IsEnum(['SUBSCRIPER'])
+//   @IsDefined()
+//   @IsEnum(['SUBSCRIPER'])
   type: 'SUBSCRIPER';
 
-  @IsDefined()
-  @IsNumber()
-  @ExistsInDb(Billing, 'id', { message: 'Billing ID does not exist' })
+//   @IsDefined()
+//   @IsNumber()
+//   @ExistsInDb(Billing, 'id', { message: 'Billing ID does not exist' })
   billingId: number;
 
-  @IsDefined()
-  @IsNumber()
-  @ExistsInDb(Subscriper, 'id', { message: 'Subscriper ID does not exist' })
+//   @IsDefined()
+//   @IsNumber()
+//   @ExistsInDb(Subscriper, 'id', { message: 'Subscriper ID does not exist' })
   subscriperId: number;
 }
 
 export class AddGuestRevenueDto extends AddRevenueDto {
-  @IsDefined()
-  @IsEnum(['GUEST'])
+//   @IsDefined()
+//   @IsEnum(['GUEST'])
   type: 'GUEST';
 
-  @IsDefined()
-  @IsString()
+//   @IsDefined()
+//   @IsString()
   username: string;
 
-  @IsDefined()
-  @IsNumber()
+//   @IsDefined()
+//   @IsNumber()
   sessionId: number;
 }
 
 export class AddPointRevenueDto extends AddRevenueDto {
-  @IsDefined()
-  @IsEnum(['POINT'])
+//   @IsDefined()
+//   @IsEnum(['POINT'])
   type: 'POINT';
 
-  @IsDefined()
-  @IsNumber()
+//   @IsDefined()
+//   @IsNumber()
   pointBillingId: number;
 
-  @IsDefined()
-  @IsNumber()
+//   @IsDefined()
+//   @IsNumber()
   pointId: number;
 }
