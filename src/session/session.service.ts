@@ -65,7 +65,7 @@ export class SessionService {
         }
         if(session.clientType=='GUEST'){
             // get session total amount
-            const result = await Order.findOne({
+            const result = await this.orderModel.findOne({
                 where: { sessionId:id },
                 attributes: [[fn('SUM', col('price')), 'total']],
                 raw: true,
@@ -73,7 +73,7 @@ export class SessionService {
             if(!result){
                 throw new Error('problem when calcualting the total amount');
             }
-            const amount=parseFloat(result?.get({ plain: true }).total);
+            const amount=parseFloat((result as any).total);
             // record a revenue transaction
             await this.revenueService.addGuestRevenue({
                 type:'GUEST',

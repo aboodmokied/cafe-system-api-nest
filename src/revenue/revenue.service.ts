@@ -6,6 +6,7 @@ import { SubscriperRevenue } from './subscriper-revenue.model';
 import { GuestRevenue } from './guest-revenue.model';
 import { Op } from 'sequelize';
 import { endOfDay, startOfDay } from 'date-fns';
+import sequelize from 'sequelize';
 
 @Injectable()
 export class RevenueService {
@@ -78,8 +79,14 @@ export class RevenueService {
             ],
             order: [['date', 'DESC']],
         });
-
-        return revenues;
+        // Fetch total amount separately
+        const totalAmountResult = await this.revenueModel.findOne({
+            attributes: [[sequelize.fn("SUM", sequelize.col("amount")), "totalAmount"]],
+            where: whereClause,
+            raw: true,
+        });
+        const totalAmount = Number((totalAmountResult as any)?.totalAmount || 0);
+        return {revenues,totalAmount};
     }
 
 
