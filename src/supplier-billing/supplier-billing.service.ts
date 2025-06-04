@@ -2,10 +2,14 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { InjectModel } from '@nestjs/sequelize';
 import { SupplierBilling } from './supplier-billing.model';
 import { CreateSupplierBillingDto, SupplierBillingPaymentDto } from './supplier-billing.dto';
+import { ExpensesService } from 'src/expenses/expenses.service';
 
 @Injectable()
 export class SupplierBillingService {
-    constructor(@InjectModel(SupplierBilling) private supplierBillingModel:typeof SupplierBilling){}
+    constructor(
+        @InjectModel(SupplierBilling) private supplierBillingModel:typeof SupplierBilling,
+        private expensesService:ExpensesService
+    ){}
 
     async createSupplierBilling(createSupplierBiliingDto:CreateSupplierBillingDto){
         const supplierBilling=await this.supplierBillingModel.create({...createSupplierBiliingDto});
@@ -33,8 +37,14 @@ export class SupplierBillingService {
             billing.paidAmount=temp;
             billing.save();
     
-            // TODO record a expenses transaction
-    
+            // record a expenses transaction
+            await this.expensesService.addSupplierExpenses({
+                type:'SUPPLIER',
+                amount,
+                date:new Date(),
+                supplierBillingId,
+                supplierId:billing.supplierId
+            })
             return billing;
         }
 }

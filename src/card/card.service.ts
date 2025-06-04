@@ -4,6 +4,7 @@ import { Card } from './card.model';
 import { AddToStockDto, CreateCardDto } from './card.dto';
 import { CardImportService } from 'src/card-import/card-import.service';
 import { SupplierBillingService } from 'src/supplier-billing/supplier-billing.service';
+import { ExpensesService } from 'src/expenses/expenses.service';
 
 @Injectable()
 export class CardService {
@@ -11,6 +12,7 @@ export class CardService {
         @InjectModel(Card) private cardModel:typeof Card,
         private cardImportService:CardImportService,
         private supplierBillingService:SupplierBillingService,
+        private expensesService:ExpensesService,
     ){}
     
     getCards(){
@@ -53,7 +55,7 @@ export class CardService {
         // });
 
         // create supplier billing 
-        await this.supplierBillingService.createSupplierBilling({
+        const billing=await this.supplierBillingService.createSupplierBilling({
             cardId,
             cardsCount:qty,
             supplierId,
@@ -61,6 +63,16 @@ export class CardService {
             paidAmount:paidPrice??0,
             isPaid:totalPrice==paidPrice
         });
+        // create expenses transaction
+        if(paidPrice>0){
+            await this.expensesService.addSupplierExpenses({
+                type:'SUPPLIER',
+                amount:paidPrice,
+                date:new Date(),
+                supplierBillingId:billing.id,
+                supplierId:billing.supplierId
+            })
+        }
         const updatedCard=await card.update({qty:card.qty+addToStockDto.qty});
         return updatedCard;
     }
