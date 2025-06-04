@@ -7,7 +7,7 @@ export class ExpensesController {
     constructor(private expensesService:ExpensesService){}
 
     @Get()
-    async getRevenues(
+    async getExpenses(
         @Res() res:Response,
         @Query('startDate') startDate?: string,
         @Query('endDate') endDate?: string,
