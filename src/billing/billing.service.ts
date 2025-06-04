@@ -22,13 +22,14 @@ export class BillingService {
         });
 
         if(billing){
-            const today = startOfDay(new Date()); // وقت اليوم = 00:00:00
-            const endDay = startOfDay(new Date(billing.endDate)); // وقت نهاية الدورة
-            if(endDay > today){
+            const now = new Date();
+            const endDay = new Date(billing.endDate);
+            if (endDay > now) {
                 return billing;
-            }
+            }   
         }
-        return this.createNewBilling({subscriperId,type});
+        const newBilling=await this.createNewBilling({subscriperId,type});
+        return newBilling;
     }
 
     async createNewBilling(createBillingDto:CreateBillingDto){

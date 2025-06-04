@@ -11,6 +11,7 @@ import { CardImportModule } from './card-import/card-import.module';
 import { SubscriperModule } from './subscriper/subscriper.module';
 import { BillingModule } from './billing/billing.module';
 import { RevenueModule } from './revenue/revenue.module';
+import { SupplierBillingModule } from './supplier-billing/supplier-billing.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { RevenueModule } from './revenue/revenue.module';
     SubscriperModule,
     BillingModule,
     RevenueModule,
+    SupplierBillingModule,
   ],
 })
 export class AppModule {}

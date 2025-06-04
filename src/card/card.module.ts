@@ -5,9 +5,10 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { Card } from './card.model';
 import { AuthModule } from 'src/auth/auth.module';
 import { CardImportModule } from 'src/card-import/card-import.module';
+import { SupplierBillingModule } from 'src/supplier-billing/supplier-billing.module';
 
 @Module({
-  imports:[AuthModule,SequelizeModule.forFeature([Card]),CardImportModule],
+  imports:[AuthModule,SequelizeModule.forFeature([Card]),CardImportModule,SupplierBillingModule],
   providers: [CardService],
   controllers: [CardController],
   exports: [CardService]

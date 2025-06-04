@@ -3,7 +3,7 @@ import { Billing } from 'src/billing/billing.model';
 import { Order } from 'src/order/order.model';
 import { Subscriper } from 'src/subscriper/subscriper.model';
 
-@Table
+@Table({ tableName: 'sessions' })
 export class Session extends Model {
   @Column({
     type: DataType.STRING,

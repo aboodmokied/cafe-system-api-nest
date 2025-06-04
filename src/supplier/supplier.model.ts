@@ -1,4 +1,5 @@
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, HasMany } from 'sequelize-typescript';
+import { SupplierBilling } from 'src/supplier-billing/supplier-billing.model';
 
 @Table
 export class Supplier extends Model {
@@ -15,4 +16,6 @@ export class Supplier extends Model {
   })
   phone: string;
 
+  @HasMany(()=>SupplierBilling)
+  supplierBillings:SupplierBilling[];
 }

@@ -3,10 +3,15 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Card } from './card.model';
 import { AddToStockDto, CreateCardDto } from './card.dto';
 import { CardImportService } from 'src/card-import/card-import.service';
+import { SupplierBillingService } from 'src/supplier-billing/supplier-billing.service';
 
 @Injectable()
 export class CardService {
-    constructor(@InjectModel(Card) private cardModel:typeof Card,private cardImportService:CardImportService){}
+    constructor(
+        @InjectModel(Card) private cardModel:typeof Card,
+        private cardImportService:CardImportService,
+        private supplierBillingService:SupplierBillingService,
+    ){}
     
     getCards(){
         return this.cardModel.findAll();
@@ -38,13 +43,23 @@ export class CardService {
             throw new NotFoundException('Card Not Found')
         }
         const {cardId,paidPrice,qty,supplierId,totalPrice}=addToStockDto;
-        await this.cardImportService.addImport({
+        // await this.cardImportService.addImport({
+        //     cardId,
+        //     paidPrice,
+        //     qty,
+        //     supplierId,
+        //     totalPrice,
+        //     qtyBeforeImport:card.qty
+        // });
+
+        // create supplier billing 
+        await this.supplierBillingService.createSupplierBilling({
             cardId,
-            paidPrice,
-            qty,
+            cardsCount:qty,
             supplierId,
-            totalPrice,
-            qtyBeforeImport:card.qty
+            totalAmount:totalPrice,
+            paidAmount:paidPrice??0,
+            isPaid:totalPrice==paidPrice
         });
         const updatedCard=await card.update({qty:card.qty+addToStockDto.qty});
         return updatedCard;
