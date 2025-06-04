@@ -5,6 +5,9 @@ import { startOfDay } from 'date-fns';
 import { BillingPaymentDto, CreateBillingDto } from './billing.dto';
 import { literal } from 'sequelize';
 import { RevenueService } from 'src/revenue/revenue.service';
+import { Op } from 'sequelize';
+import sequelize from 'sequelize';
+import { Subscriper } from 'src/subscriper/subscriper.model';
 
 type BillingWithTotal = Billing & { totalPrice: number };
 
@@ -97,4 +100,57 @@ export class BillingService {
 
         return billing;
     }
+
+
+async getCollectionBillings(page = 1, limit = 10) {
+  const now = new Date();
+  const offset = (page - 1) * limit;
+
+  const billings = await this.billingModel.findAll({
+    where: {
+      isPaid: false,
+      endDate: { [Op.lte]: now },
+    },
+    include: [
+      {
+        model: Subscriper,
+        attributes: ['username'],
+      },
+    ],
+    limit,
+    offset,
+    order: [['endDate', 'ASC']],
+  });
+
+  const totalAmountResult = await this.billingModel.findOne({
+    attributes: [[sequelize.literal('SUM(`totalAmount` - `paidAmount`)'), 'totalAmount']],
+    where: {
+      isPaid: false,
+      endDate: { [Op.lte]: now },
+    },
+    raw: true,
+  });
+
+  const totalAmount = totalAmountResult?.totalAmount ?? 0;
+
+  const count = await this.billingModel.count({
+    where: {
+      isPaid: false,
+      endDate: { [Op.lte]: now },
+    },
+  });
+
+  const totalPages = Math.ceil(count / limit);
+
+  return {
+    billings,
+    totalAmount,
+    pagination: {
+      page,
+      limit,
+      totalPages,
+    },
+  };
+}
+
 }
