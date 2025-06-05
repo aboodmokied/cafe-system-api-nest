@@ -14,6 +14,7 @@ import { RevenueModule } from './revenue/revenue.module';
 import { SupplierBillingModule } from './supplier-billing/supplier-billing.module';
 import { ExpensesModule } from './expenses/expenses.module';
 import { SalesPointModule } from './sales-point/sales-point.module';
+import { PointBillingModule } from './point-billing/point-billing.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { SalesPointModule } from './sales-point/sales-point.module';
     SupplierBillingModule,
     ExpensesModule,
     SalesPointModule,
+    PointBillingModule,
   ],
 })
 export class AppModule {}

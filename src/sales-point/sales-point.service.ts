@@ -3,6 +3,8 @@ import { InjectModel } from '@nestjs/sequelize';
 import { SalesPoint } from './sales-point.model';
 import { literal } from 'sequelize';
 import { CreateSalesPointDto } from './sales-point.dto';
+import { PointBilling } from 'src/point-billing/point-billing.model';
+import { Card } from 'src/card/card.model';
 
 @Injectable()
 export class SalesPointService {
@@ -16,42 +18,41 @@ export class SalesPointService {
             return salesPoints;
         }
     
-        // TODO
         async getSalesPointReport(salesPointId:number){
             const salesPoint=await this.salesPointModel.findByPk(salesPointId,{
                 include:[]
             });
             if(!salesPoint){
-                throw new NotFoundException('supplier not found');
+                throw new NotFoundException('sales point not found');
             }
             return this.salesPointModel.findOne({
                 where: { id:salesPointId },
-                // include: [
-                // {
-                //     model: SalesPointBilling,
-                //     order: [['date', 'DESC']],
-                //     include: [
-                //     {
-                //         model: Card,
-                //         required:true
-                //     },
-                //     ],
-                // },
-                // ],
-            //     attributes: {
-            //     include: [
-            //         [
-            //             literal(`(
-            //                 SELECT COALESCE(SUM(totalAmount - paidAmount), 0)
-            //                 FROM supplier_billings
-            //                 WHERE supplier_billings.supplierId = Supplier.id AND supplier_billings.isPaid = false
-            //             )`),
-            //             'supplierTotalAmount',
-            //         ],
-            //     ],
-            //     },
-            //     raw: false,
-            //     subQuery: false,
+                include: [
+                {
+                    model: PointBilling,
+                    order: [['date', 'DESC']],
+                    include: [
+                    {
+                        model: Card,
+                        required:true
+                    },
+                    ],
+                },
+                ],
+                attributes: {
+                include: [
+                    [
+                        literal(`(
+                            SELECT COALESCE(SUM(totalAmount - paidAmount), 0)
+                            FROM point_billings
+                            WHERE point_billings.pointId = SalesPoint.id AND point_billings.isPaid = false
+                        )`),
+                        'salesPointTotalAmount',
+                    ],
+                ],
+                },
+                raw: false,
+                subQuery: false,
             });
         }
     

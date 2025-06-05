@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, ParseIntPipe, Post, Res } from '@nestjs/common';
 import { SalesPointService } from './sales-point.service';
 import { Response } from 'express';
 import { CreateSalesPointDto } from './sales-point.dto';
@@ -14,15 +14,14 @@ export class SalesPointController {
         return res.send({suppliers});
     }
 
-    TODO
-    // @Get(':id/report')
-    // async getSubscriperReport(@Res() res:Response,@Param('id',ParseIntPipe) id:number){
-    //     const supplier= await this.supplierService.getSubscriperReport(id);
-    //     if(!supplier){
-    //         throw new NotFoundException('supplier not found');
-    //     }
-    //     return res.send({supplier});
-    // }
+    @Get(':id/report')
+    async getSalesPointReport(@Res() res:Response,@Param('id',ParseIntPipe) id:number){
+        const salesPoint= await this.salesPointService.getSalesPointReport(id);
+        if(!salesPoint){
+            throw new NotFoundException('salesPoint not found');
+        }
+        return res.send({salesPoint});
+    }
 
     @Post()
     async addSalesPoint(@Res() res:Response,@Body() createSalesPointDto:CreateSalesPointDto){

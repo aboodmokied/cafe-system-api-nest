@@ -8,7 +8,7 @@ export class BillingController {
     constructor(private billingService:BillingService){}
 
     @Get('collection')
-    async getExpenses(
+    async getCollectionBillings(
         @Res() res:Response,
         @Query('page') page: string,
         @Query('limit') limit: string,

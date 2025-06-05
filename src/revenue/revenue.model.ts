@@ -2,6 +2,7 @@
 import { Table, Column, Model, DataType, HasOne } from 'sequelize-typescript';
 import { SubscriperRevenue } from './subscriper-revenue.model';
 import { GuestRevenue } from './guest-revenue.model';
+import { PointRevenue } from './point-revenue.model';
 
 
 @Table({
@@ -30,5 +31,8 @@ export class Revenue extends Model {
 
   @HasOne(() => GuestRevenue)
   guestRevenue: GuestRevenue;
+
+  @HasOne(() => PointRevenue)
+  pointRevenue: PointRevenue;
 
 }
