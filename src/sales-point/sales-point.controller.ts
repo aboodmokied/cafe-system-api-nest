@@ -10,8 +10,8 @@ export class SalesPointController {
 
     @Get()
     async getSalesPoints(@Res() res:Response){
-        const suppliers=await this.salesPointService.getSalesPoints();
-        return res.send({suppliers});
+        const salesPoints=await this.salesPointService.getSalesPoints();
+        return res.send({salesPoints});
     }
 
     @Get(':id/report')

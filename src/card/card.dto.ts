@@ -41,3 +41,25 @@ export class AddToStockDto{
     @IsNotEmpty()
     paidPrice: number;
 }
+
+export class RemoveFromStockDto{
+    @IsNumber()
+    @IsNotEmpty()
+    cardId:number;
+
+    @IsNumber()
+    @IsNotEmpty()
+    pointId:number;
+
+    @IsNumber()
+    @IsNotEmpty()
+    qty:number;
+
+    @IsNumber()
+    @IsNotEmpty()
+    totalPrice:number;
+
+    @IsNumber()
+    @IsNotEmpty()
+    paidPrice: number;
+}

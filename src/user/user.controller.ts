@@ -3,7 +3,7 @@ import { UserService } from './user.service';
 import { Request } from 'express';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
-@UseGuards(JwtAuthGuard) // 🔒 applies to ALL routes in this controller
+// @UseGuards(JwtAuthGuard) // 🔒 applies to ALL routes in this controller
 @Controller('user')
 export class UserController {
     constructor(private userService:UserService){}

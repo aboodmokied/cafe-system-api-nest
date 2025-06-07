@@ -1,17 +1,19 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Card } from './card.model';
-import { AddToStockDto, CreateCardDto } from './card.dto';
-import { CardImportService } from 'src/card-import/card-import.service';
+import { AddToStockDto, CreateCardDto, RemoveFromStockDto } from './card.dto';
 import { SupplierBillingService } from 'src/supplier-billing/supplier-billing.service';
 import { ExpensesService } from 'src/expenses/expenses.service';
+import { PointBillingService } from 'src/point-billing/point-billing.service';
+import { RevenueService } from 'src/revenue/revenue.service';
 
 @Injectable()
 export class CardService {
     constructor(
         @InjectModel(Card) private cardModel:typeof Card,
-        private cardImportService:CardImportService,
         private supplierBillingService:SupplierBillingService,
+        private pointBillingService:PointBillingService,
+        private revenueService:RevenueService,
         private expensesService:ExpensesService,
     ){}
     
@@ -32,9 +34,11 @@ export class CardService {
         const card=await this.cardModel.findByPk(cardId);
         if(card){
             if(card.qty>0){
-                return await card.update({qty:--card.qty});
+                await card.update({qty:--card.qty});
+                return card;
+            }else{
+                throw new BadRequestException(['لا يوجد بطاقات في المخزون']);
             }
-            return card;
         }
         return null;
     }
@@ -45,15 +49,6 @@ export class CardService {
             throw new NotFoundException('Card Not Found')
         }
         const {cardId,paidPrice,qty,supplierId,totalPrice}=addToStockDto;
-        // await this.cardImportService.addImport({
-        //     cardId,
-        //     paidPrice,
-        //     qty,
-        //     supplierId,
-        //     totalPrice,
-        //     qtyBeforeImport:card.qty
-        // });
-
         // create supplier billing 
         const billing=await this.supplierBillingService.createSupplierBilling({
             cardId,
@@ -76,4 +71,38 @@ export class CardService {
         const updatedCard=await card.update({qty:card.qty+addToStockDto.qty});
         return updatedCard;
     }
+
+    async removeFromStock(removeFromStockDto:RemoveFromStockDto){
+        const card=await this.cardModel.findByPk(removeFromStockDto.cardId);
+        if(!card){
+            throw new NotFoundException('Card Not Found')
+        }
+        const {cardId,paidPrice,qty,pointId,totalPrice}=removeFromStockDto;
+        if(qty>card.qty){
+            throw new BadRequestException(['عدد البطاقات في المخزون غير كافي']);
+        }
+        // create point billing 
+        const billing=await this.pointBillingService.createPointBilling({
+            cardId,
+            cardsCount:qty,
+            pointId,
+            totalAmount:totalPrice,
+            paidAmount:paidPrice??0,
+            isPaid:totalPrice==paidPrice
+        });
+        // create revenue transaction
+        if(paidPrice>0){
+            await this.revenueService.addPointRevenue({
+                type:'POINT',
+                amount:paidPrice,
+                date:new Date(),
+                pointBillingId:billing.id,
+                pointId:billing.pointId
+            })
+        }
+        const updatedCard=await card.update({qty:card.qty-removeFromStockDto.qty});
+        return updatedCard;
+    }
+
+
 }

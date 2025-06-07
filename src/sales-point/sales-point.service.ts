@@ -47,7 +47,7 @@ export class SalesPointService {
                             FROM point_billings
                             WHERE point_billings.pointId = SalesPoint.id AND point_billings.isPaid = false
                         )`),
-                        'salesPointTotalAmount',
+                        'pointTotalAmount',
                     ],
                 ],
                 },
