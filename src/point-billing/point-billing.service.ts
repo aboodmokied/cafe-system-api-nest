@@ -6,6 +6,7 @@ import { CreatePointBillingDto, PointBillingPaymentDto } from './point-billing.d
 import { Op } from 'sequelize';
 import { SalesPoint } from 'src/sales-point/sales-point.model';
 import sequelize from 'sequelize';
+import { Card } from 'src/card/card.model';
 
 @Injectable()
 export class PointBillingService {
@@ -53,30 +54,30 @@ export class PointBillingService {
         }
 
         async getCollectionBillings(page = 1, limit = 10) {
-          const now = new Date();
           const offset = (page - 1) * limit;
         
           const billings = await this.pointBillingModel.findAll({
             where: {
               isPaid: false,
-              endDate: { [Op.lte]: now },
             },
             include: [
               {
                 model: SalesPoint,
                 attributes: ['name'],
               },
+              {
+                model:Card
+              }
             ],
             limit,
             offset,
-            order: [['endDate', 'ASC']],
+            order: [['date', 'DESC']],
           });
         
           const totalAmountResult = await this.pointBillingModel.findOne({
             attributes: [[sequelize.literal('SUM(`totalAmount` - `paidAmount`)'), 'totalAmount']],
             where: {
               isPaid: false,
-              endDate: { [Op.lte]: now },
             },
             raw: true,
           });
@@ -86,7 +87,6 @@ export class PointBillingService {
           const count = await this.pointBillingModel.count({
             where: {
               isPaid: false,
-              endDate: { [Op.lte]: now },
             },
           });
         
