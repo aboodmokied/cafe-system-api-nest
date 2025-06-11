@@ -9,6 +9,8 @@ export class ExpensesController {
     @Get()
     async getExpenses(
         @Res() res:Response,
+        @Query('page') page: string,
+        @Query('limit') limit: string,
         @Query('startDate') startDate?: string,
         @Query('endDate') endDate?: string,
     ){
@@ -23,13 +25,19 @@ export class ExpensesController {
 
         let parsedEndDate = endDate ? new Date(endDate) : defaultEnd;
         
-        const {expenses,totalAmount}=await this.expensesService.getExpensesByDate(parsedStartDate,parsedEndDate);
+        const {expenses,totalAmount,pagination}=await this.expensesService.getExpensesByDate({
+            startDate:parsedStartDate,
+            endDate:parsedEndDate,
+            page:+page,
+            limit:+limit
+        });
 
         return res.send({
             expenses,
             totalAmount,
             startDate:parsedStartDate.toISOString(),
             endDate:parsedEndDate.toISOString(),
+            pagination
         })
     }
 }

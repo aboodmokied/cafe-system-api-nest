@@ -9,6 +9,7 @@ import {
   HasOne,
 } from 'sequelize-typescript';
 import { Card } from 'src/card/card.model';
+import { CustomModel } from 'src/custom-model/custom-model';
 import { Supplier } from 'src/supplier/supplier.model';
 
 @Table({ 
@@ -16,7 +17,7 @@ import { Supplier } from 'src/supplier/supplier.model';
     timestamps: true,
     createdAt: 'date',
  })
-export class SupplierBilling extends Model {
+export class SupplierBilling extends CustomModel {
   @ForeignKey(() => Supplier)
   @Column({ type: DataType.INTEGER })
   supplierId: number;

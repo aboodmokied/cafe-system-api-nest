@@ -7,11 +7,12 @@ import {
   BelongsTo,
   HasMany,
 } from 'sequelize-typescript';
+import { CustomModel } from 'src/custom-model/custom-model';
 import { Session } from 'src/session/session.model';
 import { Subscriper } from 'src/subscriper/subscriper.model';
 
 @Table({ tableName: 'billings' })
-export class Billing extends Model {
+export class Billing extends CustomModel {
   @ForeignKey(() => Subscriper)
   @Column({ type: DataType.INTEGER })
   subscriperId: number;

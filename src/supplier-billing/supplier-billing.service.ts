@@ -52,9 +52,7 @@ export class SupplierBillingService {
         }
 
         async getCollectionBillings(page = 1, limit = 10) {
-            const offset = (page - 1) * limit;
-        
-            const billings = await this.supplierBillingModel.findAll({
+            const {data:billings,pagination} = await this.supplierBillingModel.findWithPagination(page,limit,{
             where: {
                 isPaid: false,
             },
@@ -67,8 +65,6 @@ export class SupplierBillingService {
                 model: Card,
                 },
             ],
-            limit,
-            offset,
             order: [['date', 'DESC']],
             });
         
@@ -82,22 +78,10 @@ export class SupplierBillingService {
         
             const totalAmount = totalAmountResult?.totalAmount ?? 0;
         
-            const count = await this.supplierBillingModel.count({
-            where: {
-                isPaid: false,
-            },
-            });
-        
-            const totalPages = Math.ceil(count / limit);
-        
             return {
                 billings,
                 totalAmount,
-                pagination: {
-                    page,
-                    limit,
-                    totalPages,
-                },
+                pagination
             };
         }
 }

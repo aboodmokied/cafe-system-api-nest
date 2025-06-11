@@ -6,13 +6,17 @@ import { Billing } from 'src/billing/billing.model';
 import { Session } from 'src/session/session.model';
 import { Order } from 'src/order/order.model';
 import { Sequelize, fn, col, literal } from 'sequelize';
+import { getPaginationOptions } from 'src/utils/pagination-options';
 
 @Injectable()
 export class SubscriperService {
     constructor(@InjectModel(Subscriper) private subscriperModel:typeof Subscriper){}
 
-    async allSubscripers(){
-        return this.subscriperModel.findAll();
+    async allSubscripers(page = 1, limit = 10){
+        const {data:subscripers,pagination}=await this.subscriperModel.findWithPagination(page,limit,{
+            order: [['createdAt', 'DESC']]
+        })
+        return {subscripers,pagination}
     }
 
     async getSubscriperById(subscriperId:number){
@@ -36,18 +40,14 @@ export class SubscriperService {
         return this.subscriperModel.create({...createSubscriperDto});
     }
 
-    async getSubscriperReport(subscriberId:number){
-        const subscriper=await this.subscriperModel.findByPk(subscriberId,{
-            include:[]
-        });
-        if(!subscriper){
-            throw new NotFoundException('subscriper not found');
-        }
-        return this.subscriperModel.findOne({
+    async getSubscriperReport(subscriberId:number,page = 1, limit = 10){
+        const paginationOptions=getPaginationOptions(page,limit);
+        const subscriper=await this.subscriperModel.findOne({
             where: { id:subscriberId },
             include: [
             {
                 model: Billing,
+                ...paginationOptions,
                 order: [['startDate', 'DESC']],
                 include: [
                 {
@@ -71,5 +71,20 @@ export class SubscriperService {
             raw: false,
             subQuery: false,
         });
+        if(!subscriper){
+            throw new NotFoundException('subscriper not found');
+        }
+        const subscriperBillingsCount=await subscriper.getBillingsCount();
+        const totalPages = Math.ceil(subscriperBillingsCount / limit);
+
+        return{
+            subscriper,
+            pagination:{
+                page,
+                limit,
+                totalPages
+            }
+            
+        }
     }
 }

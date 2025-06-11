@@ -34,7 +34,10 @@ export class ExpensesService {
 
 
 
-        async getExpensesByDate(startDate?: Date, endDate?: Date) {
+        async getExpensesByDate(options:{startDate?:Date,endDate?:Date,page?:number,limit?:number}) {
+                const {startDate,endDate}=options;
+                const limit=options.limit || 10;
+                const page=options.page || 1;
                 const whereClause: any = {};
                 if (startDate && endDate) {
                     whereClause.date = {
@@ -50,7 +53,7 @@ export class ExpensesService {
                     };
                 }
         
-                const expenses = await this.expensesModel.findAll({
+                const {data:expenses,pagination} = await this.expensesModel.findWithPagination(page,limit,{
                     where: whereClause,
                     include: [
                     { model: SupplierExpenses, required: false },
@@ -64,6 +67,10 @@ export class ExpensesService {
                     raw: true,
                 });
                 const totalAmount = Number((totalAmountResult as any)?.totalAmount || 0);
-                return {expenses,totalAmount};
+                return {
+                    expenses,
+                    totalAmount,
+                    pagination
+                };
             }
 }

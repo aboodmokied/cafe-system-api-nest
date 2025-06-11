@@ -9,6 +9,8 @@ export class RevenueController {
     @Get()
     async getRevenues(
         @Res() res:Response,
+        @Query('page') page: string,
+        @Query('limit') limit: string,
         @Query('startDate') startDate?: string,
         @Query('endDate') endDate?: string,
     ){
@@ -23,13 +25,14 @@ export class RevenueController {
 
         let parsedEndDate = endDate ? new Date(endDate) : defaultEnd;
         
-        const {revenues,totalAmount}=await this.revenueService.getRevenuesByDate(parsedStartDate,parsedEndDate);
+        const {revenues,totalAmount,pagination}=await this.revenueService.getRevenuesByDate({startDate:parsedStartDate,endDate:parsedEndDate,page:+page,limit:+limit});
 
         return res.send({
             revenues,
             totalAmount,
             startDate:parsedStartDate.toISOString(),
             endDate:parsedEndDate.toISOString(),
+            pagination
         })
     }    
 }

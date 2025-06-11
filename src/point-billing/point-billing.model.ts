@@ -9,6 +9,7 @@ import {
   HasOne,
 } from 'sequelize-typescript';
 import { Card } from 'src/card/card.model';
+import { CustomModel } from 'src/custom-model/custom-model';
 import { SalesPoint } from 'src/sales-point/sales-point.model';
 
 @Table({ 
@@ -16,7 +17,7 @@ import { SalesPoint } from 'src/sales-point/sales-point.model';
     timestamps: true,
     createdAt: 'date',
  })
-export class PointBilling extends Model {
+export class PointBilling extends CustomModel {
   @ForeignKey(() => SalesPoint)
   @Column({ type: DataType.INTEGER })
   pointId: number;

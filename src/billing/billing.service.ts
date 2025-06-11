@@ -104,9 +104,8 @@ export class BillingService {
 
 async getCollectionBillings(page = 1, limit = 10) {
   const now = new Date();
-  const offset = (page - 1) * limit;
 
-  const billings = await this.billingModel.findAll({
+  const {data:billings,pagination} = await this.billingModel.findWithPagination(page,limit,{
     where: {
       isPaid: false,
       endDate: { [Op.lte]: now },
@@ -117,8 +116,6 @@ async getCollectionBillings(page = 1, limit = 10) {
         attributes: ['username'],
       },
     ],
-    limit,
-    offset,
     order: [['endDate', 'ASC']],
   });
 
@@ -133,23 +130,10 @@ async getCollectionBillings(page = 1, limit = 10) {
 
   const totalAmount = totalAmountResult?.totalAmount ?? 0;
 
-  const count = await this.billingModel.count({
-    where: {
-      isPaid: false,
-      endDate: { [Op.lte]: now },
-    },
-  });
-
-  const totalPages = Math.ceil(count / limit);
-
   return {
     billings,
     totalAmount,
-    pagination: {
-      page,
-      limit,
-      totalPages,
-    },
+    pagination
   };
 }
 

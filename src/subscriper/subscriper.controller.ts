@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, NotFoundException, Param, ParseIntPipe, Post, Res, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, NotFoundException, Param, ParseIntPipe, Post, Query, Res, UseGuards } from '@nestjs/common';
 import { SubscriperService } from './subscriper.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Response } from 'express';
@@ -10,18 +10,27 @@ export class SubscriperController {
     constructor(private subscriperService:SubscriperService){}
 
     @Get()
-    async getSubscripers(@Res() res:Response){
-        const subscripers= await this.subscriperService.allSubscripers();
-        return res.send({subscripers});
+    async getSubscripers(
+        @Res() res:Response,
+        @Query('page') page: string,
+        @Query('limit') limit: string
+    ){
+        const {subscripers,pagination}= await this.subscriperService.allSubscripers(+page,+limit);
+        return res.send({subscripers,pagination});
     }
 
     @Get(':id/report')
-    async getSubscriperReport(@Res() res:Response,@Param('id',ParseIntPipe) id:number){
-        const subscriper= await this.subscriperService.getSubscriperReport(id);
+    async getSubscriperReport(
+        @Res() res:Response,
+        @Param('id',ParseIntPipe) id:number,
+        @Query('page') page: string,
+        @Query('limit') limit: string
+    ){
+        const {subscriper,pagination}= await this.subscriperService.getSubscriperReport(id,+page,+limit);
         if(!subscriper){
             throw new NotFoundException('subscriper not found');
         }
-        return res.send({subscriper});
+        return res.send({subscriper,pagination});
     }
     
     @Get(':username')

@@ -75,7 +75,10 @@ export class RevenueService {
     };
     
 
-    async getRevenuesByDate(startDate?: Date, endDate?: Date) {
+    async getRevenuesByDate(options:{startDate?:Date,endDate?:Date,page?:number,limit?:number}) {
+        const {startDate,endDate}=options;
+        const limit=options.limit || 10;
+        const page=options.page || 1;
         const whereClause: any = {};
         if (startDate && endDate) {
             whereClause.date = {
@@ -91,7 +94,16 @@ export class RevenueService {
             };
         }
 
-        const revenues = await this.revenueModel.findAll({
+        // const revenues = await this.revenueModel.findAll({
+        //     where: whereClause,
+        //     include: [
+        //     { model: GuestRevenue, required: false },
+        //     { model: SubscriperRevenue, required: false },
+        //     { model: PointRevenue, required: false },
+        //     ],
+        //     order: [['date', 'DESC']],
+        // });
+        const {data:revenues,pagination}=await this.revenueModel.findWithPagination(page,limit,{
             where: whereClause,
             include: [
             { model: GuestRevenue, required: false },
@@ -99,7 +111,7 @@ export class RevenueService {
             { model: PointRevenue, required: false },
             ],
             order: [['date', 'DESC']],
-        });
+        })
         // Fetch total amount separately
         const totalAmountResult = await this.revenueModel.findOne({
             attributes: [[sequelize.fn("SUM", sequelize.col("amount")), "totalAmount"]],
@@ -107,34 +119,17 @@ export class RevenueService {
             raw: true,
         });
         const totalAmount = Number((totalAmountResult as any)?.totalAmount || 0);
-        return {revenues,totalAmount};
+        return {
+            revenues,
+            totalAmount,
+            pagination
+        };
     }
 
-
-    async getRevenuesBySpecificDay(date: Date) {
-        const start = startOfDay(date);
-        const end = endOfDay(date);
-
-        const revenues = await this.revenueModel.findAll({
-            where: {
-            date: {
-                [Op.between]: [start, end],
-            },
-            },
-            include: [
-            { model: GuestRevenue, required: false },
-            { model: SubscriperRevenue, required: false },
-            { model: PointRevenue, required: false },
-            ],
-            order: [['date', 'DESC']],
-        });
-
-        return revenues;
-    }
 
     
-    async getRevenuesByUser(userId: number) {
-        const revenues = await this.revenueModel.findAll({
+    async getRevenuesByUser(userId: number,page=1,limit=10) {
+        const {data:revenues,pagination} = await this.revenueModel.findWithPagination(page,limit,{
             where: { userId },
             include: [
             { model: SubscriperRevenue, required: false },
@@ -144,7 +139,7 @@ export class RevenueService {
             order: [['date', 'DESC']],
         });
 
-        return revenues;
+        return {revenues,pagination};
     }
 
 

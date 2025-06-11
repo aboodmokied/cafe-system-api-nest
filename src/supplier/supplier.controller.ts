@@ -1,4 +1,4 @@
-import { Body, Controller, Get, NotFoundException, Param, ParseIntPipe, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, ParseIntPipe, Post, Query, Res, UseGuards } from '@nestjs/common';
 import { SupplierService } from './supplier.service';
 import { Response } from 'express';
 import { CreateSupplierDto } from './supplier.dto';
@@ -10,18 +10,27 @@ export class SupplierController {
     constructor(private supplierService:SupplierService){}
 
     @Get()
-    async getSuppliers(@Res() res:Response){
-        const suppliers=await this.supplierService.getSuppliers();
-        return res.send({suppliers});
+    async getSuppliers(
+        @Res() res:Response,
+        @Query('page') page: string,
+        @Query('limit') limit: string
+    ){
+        const {suppliers,pagination}=await this.supplierService.getSuppliers(+page,+limit);
+        return res.send({suppliers,pagination});
     }
 
     @Get(':id/report')
-    async getSubscriperReport(@Res() res:Response,@Param('id',ParseIntPipe) id:number){
-        const supplier= await this.supplierService.getSubscriperReport(id);
+    async getSubscriperReport(
+        @Res() res:Response,
+        @Param('id',ParseIntPipe) id:number,
+        @Query('page') page: string,
+        @Query('limit') limit: string
+    ){
+        const {supplier,pagination}= await this.supplierService.getSubscriperReport(id,+page,+limit);
         if(!supplier){
             throw new NotFoundException('supplier not found');
         }
-        return res.send({supplier});
+        return res.send({supplier,pagination});
     }
 
     @Post()

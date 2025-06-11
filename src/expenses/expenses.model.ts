@@ -1,5 +1,6 @@
 import { Table, Column, Model, DataType, HasOne } from 'sequelize-typescript';
 import { SupplierExpenses } from './supplier-expenses.model';
+import { CustomModel } from 'src/custom-model/custom-model';
 
 
 @Table({
@@ -7,7 +8,7 @@ import { SupplierExpenses } from './supplier-expenses.model';
     timestamps: true,
     createdAt: 'date',
 })
-export class Expenses extends Model {
+export class Expenses extends CustomModel {
   @Column({ primaryKey: true, autoIncrement: true })
   id: number;
 
