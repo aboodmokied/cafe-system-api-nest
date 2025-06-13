@@ -1,10 +1,11 @@
 import { Table, Column, Model, DataType, HasMany, ForeignKey, BelongsTo } from 'sequelize-typescript';
 import { Billing } from 'src/billing/billing.model';
+import { CustomModel } from 'src/custom-model/custom-model';
 import { Order } from 'src/order/order.model';
 import { Subscriper } from 'src/subscriper/subscriper.model';
 
 @Table({ tableName: 'sessions' })
-export class Session extends Model {
+export class Session extends CustomModel {
   @Column({
     type: DataType.STRING,
     allowNull: false,

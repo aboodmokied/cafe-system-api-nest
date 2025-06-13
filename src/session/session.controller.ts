@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Post, Query, Res, UseGuards } from '@nestjs/common';
 import { SessionService } from './session.service';
 import { CloseSessionDto, CreateSessionDto } from './session.dto';
 import { Response } from 'express';
@@ -11,9 +11,15 @@ export class SessionController {
     constructor(private sessionService:SessionService){}
 
     @Get()
-    async getSessions(@Res() res:Response){
-        const sessions=await this.sessionService.getSessions();
-        return res.send({sessions});
+    async getSessions(
+        @Res() res:Response,
+        @Query('page') page: string,
+        @Query('limit') limit: string
+    ){
+        const pageNumber=parseInt(page||"1");
+        const limitNumber=parseInt(limit||"10");
+        const {data:sessions,pagination}=await this.sessionService.getSessions(pageNumber,limitNumber);
+        return res.send({sessions,pagination});
     }
 
     @Post()

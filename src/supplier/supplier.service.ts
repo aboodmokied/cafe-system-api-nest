@@ -18,7 +18,7 @@ export class SupplierService {
         return {suppliers,pagination}
     }
 
-    async getSubscriperReport(supplierId:number,page=1,limit=10){
+    async getSupplierReport(supplierId:number,page=1,limit=10){
         const paginationOptions=getPaginationOptions(page,limit);
         
         const supplier= await this.supplierModel.findOne({

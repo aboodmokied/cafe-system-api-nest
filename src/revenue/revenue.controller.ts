@@ -25,7 +25,15 @@ export class RevenueController {
 
         let parsedEndDate = endDate ? new Date(endDate) : defaultEnd;
         
-        const {revenues,totalAmount,pagination}=await this.revenueService.getRevenuesByDate({startDate:parsedStartDate,endDate:parsedEndDate,page:+page,limit:+limit});
+        const pageNumber=parseInt(page||"1");
+        const limitNumber=parseInt(limit||"10");
+
+        const {revenues,totalAmount,pagination}=await this.revenueService.getRevenuesByDate({
+            startDate:parsedStartDate,
+            endDate:parsedEndDate,
+            page:pageNumber,
+            limit:limitNumber
+        });
 
         return res.send({
             revenues,

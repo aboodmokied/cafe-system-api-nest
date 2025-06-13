@@ -15,7 +15,9 @@ export class SupplierController {
         @Query('page') page: string,
         @Query('limit') limit: string
     ){
-        const {suppliers,pagination}=await this.supplierService.getSuppliers(+page,+limit);
+        const pageNumber=parseInt(page||"1");
+        const limitNumber=parseInt(limit||"10");
+        const {suppliers,pagination}=await this.supplierService.getSuppliers(pageNumber,limitNumber);
         return res.send({suppliers,pagination});
     }
 
@@ -26,10 +28,9 @@ export class SupplierController {
         @Query('page') page: string,
         @Query('limit') limit: string
     ){
-        const {supplier,pagination}= await this.supplierService.getSubscriperReport(id,+page,+limit);
-        if(!supplier){
-            throw new NotFoundException('supplier not found');
-        }
+        const pageNumber=parseInt(page||"1");
+        const limitNumber=parseInt(limit||"10");
+        const {supplier,pagination}= await this.supplierService.getSupplierReport(id,pageNumber,limitNumber);
         return res.send({supplier,pagination});
     }
 

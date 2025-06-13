@@ -11,10 +11,12 @@ export class SalesPointController {
     @Get()
     async getSalesPoints(
         @Res() res:Response,
-        @Query('page') page: string,
-        @Query('limit') limit: string
+        @Query('page') page?: string,
+        @Query('limit') limit?: string
     ){
-        const {salesPoints,pagination}=await this.salesPointService.getSalesPoints(+page,+limit);
+        const pageNumber=parseInt(page||"1");
+        const limitNumber=parseInt(limit||"10");
+        const {salesPoints,pagination}=await this.salesPointService.getSalesPoints(pageNumber,limitNumber);
         return res.send({salesPoints,pagination});
     }
 
@@ -25,10 +27,9 @@ export class SalesPointController {
         @Query('page') page: string,
         @Query('limit') limit: string
     ){
-        const {salesPoint,pagination}= await this.salesPointService.getSalesPointReport(id,+page,+limit);
-        if(!salesPoint){
-            throw new NotFoundException('salesPoint not found');
-        }
+        const pageNumber=parseInt(page||"1");
+        const limitNumber=parseInt(limit||"10");
+        const {salesPoint,pagination}= await this.salesPointService.getSalesPointReport(id,pageNumber,limitNumber);
         return res.send({salesPoint,pagination});
     }
 

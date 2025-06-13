@@ -15,7 +15,9 @@ export class SubscriperController {
         @Query('page') page: string,
         @Query('limit') limit: string
     ){
-        const {subscripers,pagination}= await this.subscriperService.allSubscripers(+page,+limit);
+        const pageNumber=parseInt(page||"1");
+        const limitNumber=parseInt(limit||"10");
+        const {subscripers,pagination}= await this.subscriperService.allSubscripers(pageNumber,limitNumber);
         return res.send({subscripers,pagination});
     }
 
@@ -26,10 +28,9 @@ export class SubscriperController {
         @Query('page') page: string,
         @Query('limit') limit: string
     ){
-        const {subscriper,pagination}= await this.subscriperService.getSubscriperReport(id,+page,+limit);
-        if(!subscriper){
-            throw new NotFoundException('subscriper not found');
-        }
+        const pageNumber=parseInt(page||"1");
+        const limitNumber=parseInt(limit||"10");
+        const {subscriper,pagination}= await this.subscriperService.getSubscriperReport(id,pageNumber,limitNumber);
         return res.send({subscriper,pagination});
     }
     

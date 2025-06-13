@@ -25,11 +25,14 @@ export class ExpensesController {
 
         let parsedEndDate = endDate ? new Date(endDate) : defaultEnd;
         
+        const pageNumber=parseInt(page||"1");
+        const limitNumber=parseInt(limit||"10");
+
         const {expenses,totalAmount,pagination}=await this.expensesService.getExpensesByDate({
             startDate:parsedStartDate,
             endDate:parsedEndDate,
-            page:+page,
-            limit:+limit
+            page:pageNumber,
+            limit:limitNumber
         });
 
         return res.send({

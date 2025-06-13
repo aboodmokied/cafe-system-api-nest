@@ -94,7 +94,9 @@ export class SessionService {
         return billingId;
     }
 
-    async getSessions(){
-        return this.sessionModel.findAll();
+    async getSessions(page = 1, limit = 10){
+        return this.sessionModel.findWithPagination(page,limit,{
+            order: [['createdAt', 'DESC']]
+        });
     }
 }

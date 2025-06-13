@@ -17,6 +17,10 @@ export class PointBillingController {
     ){
         const pageNumber = parseInt(page) || 1;
         const limitNumber = parseInt(limit) || 10;
+        console.log({
+            pageNumber,
+            limitNumber
+        })
         const result=await this.pointBillingService.getCollectionBillings(pageNumber,limitNumber)
         return res.send(result);
     }
