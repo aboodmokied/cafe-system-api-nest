@@ -94,9 +94,18 @@ export class SessionService {
         return billingId;
     }
 
-    async getSessions(page = 1, limit = 10){
+    async getSessions(page = 1, limit = 10,status='open'){
+        let where:any={};
+        if(status=='open'){
+            where.isActive=true;
+        }else if(status=='closed'){
+            where.isActive=false;
+        }else{
+            where={};
+        }
         return this.sessionModel.findWithPagination(page,limit,{
-            order: [['createdAt', 'DESC']]
+            where,
+            order: [['createdAt', 'DESC']],
         });
     }
 }

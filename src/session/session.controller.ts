@@ -14,11 +14,13 @@ export class SessionController {
     async getSessions(
         @Res() res:Response,
         @Query('page') page: string,
-        @Query('limit') limit: string
+        @Query('limit') limit: string,
+        @Query('status') status: string,
     ){
         const pageNumber=parseInt(page||"1");
         const limitNumber=parseInt(limit||"10");
-        const {data:sessions,pagination}=await this.sessionService.getSessions(pageNumber,limitNumber);
+        const sessionsStatus=status||'open';
+        const {data:sessions,pagination}=await this.sessionService.getSessions(pageNumber,limitNumber,status);
         return res.send({sessions,pagination});
     }
 
