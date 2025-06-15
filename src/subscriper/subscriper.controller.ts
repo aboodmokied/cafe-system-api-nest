@@ -13,12 +13,18 @@ export class SubscriperController {
     async getSubscripers(
         @Res() res:Response,
         @Query('page') page: string,
-        @Query('limit') limit: string
+        @Query('limit') limit: string,
+        @Query('q') q?: string
     ){
         const pageNumber=parseInt(page||"1");
         const limitNumber=parseInt(limit||"10");
-        const {subscripers,pagination}= await this.subscriperService.allSubscripers(pageNumber,limitNumber);
-        return res.send({subscripers,pagination});
+        if(q&&q.length){
+            const {subscripers,pagination}= await this.subscriperService.allSubscripersWithSearch(pageNumber,limitNumber,q);
+            return res.send({subscripers,pagination});
+        }else{
+            const {subscripers,pagination}= await this.subscriperService.allSubscripers(pageNumber,limitNumber);
+            return res.send({subscripers,pagination});
+        }
     }
 
     @Get(':id/report')

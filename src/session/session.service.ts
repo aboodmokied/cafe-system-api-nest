@@ -100,8 +100,6 @@ export class SessionService {
             where.isActive=true;
         }else if(status=='closed'){
             where.isActive=false;
-        }else{
-            where={};
         }
         return this.sessionModel.findWithPagination(page,limit,{
             where,

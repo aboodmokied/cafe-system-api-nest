@@ -12,12 +12,18 @@ export class SalesPointController {
     async getSalesPoints(
         @Res() res:Response,
         @Query('page') page?: string,
-        @Query('limit') limit?: string
+        @Query('limit') limit?: string,
+        @Query('q') q?: string,
     ){
         const pageNumber=parseInt(page||"1");
         const limitNumber=parseInt(limit||"10");
-        const {salesPoints,pagination}=await this.salesPointService.getSalesPoints(pageNumber,limitNumber);
-        return res.send({salesPoints,pagination});
+        if(q&&q.length){
+            const {salesPoints,pagination}=await this.salesPointService.getSalesPointsWithSearch(pageNumber,limitNumber,q);
+            return res.send({salesPoints,pagination});
+        }else{
+            const {salesPoints,pagination}=await this.salesPointService.getSalesPoints(pageNumber,limitNumber);
+            return res.send({salesPoints,pagination});
+        }
     }
 
     @Get(':id/report')

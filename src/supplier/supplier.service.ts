@@ -17,6 +17,13 @@ export class SupplierService {
         });
         return {suppliers,pagination}
     }
+    
+    async getSuppliersWithSearch(page=1,limit=10,q:string){
+        const {data:suppliers,pagination}=await this.supplierModel.findWithPaginationAndSearch(page,limit,{
+            order: [['createdAt', 'DESC']]
+        },q,['name','phone']);
+        return {suppliers,pagination}
+    }
 
     async getSupplierReport(supplierId:number,page=1,limit=10){
         const paginationOptions=getPaginationOptions(page,limit);

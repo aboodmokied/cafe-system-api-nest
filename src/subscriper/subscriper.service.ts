@@ -19,6 +19,13 @@ export class SubscriperService {
         return {subscripers,pagination}
     }
 
+    async allSubscripersWithSearch(page = 1, limit = 10,q:string){
+        const {data:subscripers,pagination}=await this.subscriperModel.findWithPaginationAndSearch(page,limit,{
+            order: [['createdAt', 'DESC']]
+        },q,['username','phone','email']);
+        return {subscripers,pagination}
+    }
+
     async getSubscriperById(subscriperId:number){
         return this.subscriperModel.findByPk(subscriperId);
     }
@@ -88,3 +95,7 @@ export class SubscriperService {
         }
     }
 }
+
+
+// 0595786381 
+// محمد جلال البكري

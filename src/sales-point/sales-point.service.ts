@@ -15,10 +15,17 @@ export class SalesPointService {
     ){}
 
         async getSalesPoints(page=1,limit=10){
-            const {data:salesPoints,pagination}=await this.salesPointModel.findWithPagination(page,limit,{
+           const {data:salesPoints,pagination}=await this.salesPointModel.findWithPagination(page,limit,{
                 order: [['createdAt', 'DESC']]
             })
             return {salesPoints,pagination};
+        }
+
+        async getSalesPointsWithSearch(page=1,limit=10,q:string){
+            const {data:salesPoints,pagination}=await this.salesPointModel.findWithPaginationAndSearch(page,limit,{
+                order: [['createdAt', 'DESC']]
+            },q,['name','phone']);
+            return {salesPoints,pagination}
         }
     
         async getSalesPointReport(salesPointId:number,page=1,limit=10){

@@ -13,12 +13,18 @@ export class SupplierController {
     async getSuppliers(
         @Res() res:Response,
         @Query('page') page: string,
-        @Query('limit') limit: string
+        @Query('limit') limit: string,
+        @Query('q') q?: string,
     ){
         const pageNumber=parseInt(page||"1");
         const limitNumber=parseInt(limit||"10");
-        const {suppliers,pagination}=await this.supplierService.getSuppliers(pageNumber,limitNumber);
-        return res.send({suppliers,pagination});
+        if(q&&q.length){
+            const {suppliers,pagination}=await this.supplierService.getSuppliersWithSearch(pageNumber,limitNumber,q);
+            return res.send({suppliers,pagination});
+        }else{
+            const {suppliers,pagination}=await this.supplierService.getSuppliers(pageNumber,limitNumber);
+            return res.send({suppliers,pagination});
+        }
     }
 
     @Get(':id/report')
