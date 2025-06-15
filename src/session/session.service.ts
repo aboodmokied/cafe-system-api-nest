@@ -7,6 +7,7 @@ import { SubscriperService } from 'src/subscriper/subscriper.service';
 import { RevenueService } from 'src/revenue/revenue.service';
 import { col, fn } from 'sequelize';
 import { Order } from 'src/order/order.model';
+import { OrderService } from 'src/order/order.service';
 
 @Injectable()
 export class SessionService {
@@ -15,7 +16,8 @@ export class SessionService {
         @InjectModel(Order) private orderModel:typeof Order,
         private billingService:BillingService,
         private subscriperService:SubscriperService,
-        private revenueService:RevenueService
+        private revenueService:RevenueService,
+        private orderService:OrderService
     ){}
 
     async createSession({username,clientType}:CreateSessionDto){
@@ -62,6 +64,10 @@ export class SessionService {
             throw new BadRequestException('هذه الجلسة غير موجودة');
         }else if(!session.isActive){
             throw new BadRequestException('هذه الجلسة مغلقة بالفعل');
+        }
+        const activeOrder=await this.orderService.sessionHasActiveChargingOrder(session.id);
+        if(activeOrder){
+            throw new BadRequestException(['الجلسة تحتوي طلب شحن مفتوح قم بإغلاقه كي تقوم بإنهاء الجلسة']);
         }
         if(session.clientType=='GUEST'){
             // get session total amount

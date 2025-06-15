@@ -14,6 +14,7 @@ import { SessionModule } from 'src/session/session.module';
 @Module({
   imports:[AuthModule,CardModule,BillingModule,SessionModule,SequelizeModule.forFeature([Order,CardOrder,ChargingOrder,OtherOrder])],
   providers: [OrderService],
-  controllers: [OrderController]
+  controllers: [OrderController],
+  exports:[OrderService]
 })
 export class OrderModule {}

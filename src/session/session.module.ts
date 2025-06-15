@@ -8,9 +8,10 @@ import { BillingModule } from 'src/billing/billing.module';
 import { SubscriperModule } from 'src/subscriper/subscriper.module';
 import { RevenueModule } from 'src/revenue/revenue.module';
 import { Order } from 'src/order/order.model';
+import { OrderModule } from 'src/order/order.module';
 
 @Module({
-  imports:[SequelizeModule.forFeature([Session,Order]),AuthModule,BillingModule,SubscriperModule,RevenueModule],
+  imports:[SequelizeModule.forFeature([Session,Order]),AuthModule,BillingModule,SubscriperModule,RevenueModule,OrderModule],
   controllers: [SessionController],
   providers: [SessionService],
   exports:[SessionService]

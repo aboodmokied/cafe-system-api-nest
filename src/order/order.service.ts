@@ -8,6 +8,7 @@ import { OtherOrder } from './other-order.model';
 import { CardService } from 'src/card/card.service';
 import { BillingService } from 'src/billing/billing.service';
 import { SessionService } from 'src/session/session.service';
+import { Op } from 'sequelize';
 
 // function getSubOrder(order) {
 //   return order.CardOrder || order.ChargingOrder || order.OtherOrder;
@@ -87,6 +88,21 @@ export class OrderService {
         return order;
     };
 
+    async sessionHasActiveChargingOrder(sessionId:number){
+        return this.orderModel.findOne({
+            where:{
+                sessionId,
+                type:'CHARGING'
+            },
+            include:[
+                {
+                    model:ChargingOrder,
+                    where:{endAt:{[Op.ne]:null}},
+                    required:true
+                }
+            ]
+        });
+    };
     async removeOrder(){};
     async updateOrder(){};
 }
