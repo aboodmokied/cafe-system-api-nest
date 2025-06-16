@@ -15,6 +15,8 @@ import { SupplierBillingModule } from './supplier-billing/supplier-billing.modul
 import { ExpensesModule } from './expenses/expenses.module';
 import { SalesPointModule } from './sales-point/sales-point.module';
 import { PointBillingModule } from './point-billing/point-billing.module';
+import { User } from './user/user.model';
+import { AutoUserSeeder } from './seeders/auto-user.seeder';
 
 @Module({
   imports: [
@@ -36,6 +38,7 @@ import { PointBillingModule } from './point-billing/point-billing.module';
       inject: [ConfigService],
     }),
     UserModule,
+    SequelizeModule.forFeature([User]),
     AuthModule,
     SessionModule,
     OrderModule,
@@ -50,5 +53,6 @@ import { PointBillingModule } from './point-billing/point-billing.module';
     SalesPointModule,
     PointBillingModule,
   ],
+  providers:[AutoUserSeeder]
 })
 export class AppModule {}
