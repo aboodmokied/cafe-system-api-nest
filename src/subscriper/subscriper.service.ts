@@ -10,7 +10,10 @@ import { getPaginationOptions } from 'src/utils/pagination-options';
 
 @Injectable()
 export class SubscriperService {
-    constructor(@InjectModel(Subscriper) private subscriperModel:typeof Subscriper){}
+    constructor(
+        @InjectModel(Subscriper) private subscriperModel:typeof Subscriper,
+        @InjectModel(Billing) private billingModel:typeof Billing,
+    ){}
 
     async allSubscripers(page = 1, limit = 10){
         const {data:subscripers,pagination}=await this.subscriperModel.findWithPagination(page,limit,{
@@ -47,53 +50,40 @@ export class SubscriperService {
         return this.subscriperModel.create({...createSubscriperDto});
     }
 
-    async getSubscriperReport(subscriberId:number,page = 1, limit = 10){
-        const paginationOptions=getPaginationOptions(page,limit);
-        const subscriper=await this.subscriperModel.findOne({
-            where: { id:subscriberId },
-            include: [
-            {
-                model: Billing,
-                ...paginationOptions,
-                order: [['startDate', 'DESC']],
-                include: [
-                {
-                    model: Session,
-                },
-                ],
-            },
+    async getSubscriperReport(subscriperId:number,page = 1, limit = 10){
+    const subscriper = await this.subscriperModel.findOne({
+        where: { id: subscriperId },
+        attributes: {
+        include: [
+            [
+            literal(`(
+                SELECT COALESCE(SUM(totalAmount - paidAmount), 0)
+                FROM billings
+                WHERE billings.subscriperId = Subscriper.id AND billings.isPaid = false
+            )`),
+            'subscriperTotalAmount',
             ],
-            attributes: {
-            include: [
-                [
-                    literal(`(
-                        SELECT COALESCE(SUM(totalAmount - paidAmount), 0)
-                        FROM billings
-                        WHERE billings.subscriperId = Subscriper.id AND billings.isPaid = false
-                    )`),
-                    'subscriperTotalAmount',
-                ],
-            ],
-            },
-            raw: false,
-            subQuery: false,
-        });
-        if(!subscriper){
-            throw new NotFoundException('subscriper not found');
-        }
-        const subscriperBillingsCount=await subscriper.getBillingsCount();
-        const totalPages = Math.ceil(subscriperBillingsCount / limit);
+        ],
+        },
+        raw: false,
+    });
 
-        return{
-            subscriper,
-            pagination:{
-                page,
-                limit,
-                totalPages
-            }
-            
-        }
+  if (!subscriper) {
+    throw new NotFoundException('subscriper not found');
+  }
+
+  const {data:billings,pagination}=await this.billingModel.findWithPagination(page,limit,{
+    where: { subscriperId },
+    include: [{ model: Session }],
+    order: [['startDate', 'DESC']]
+  });
+  (subscriper as any).dataValues.billings=billings;
+    return{
+        subscriper,
+        pagination
+        
     }
+}
 }
 
 

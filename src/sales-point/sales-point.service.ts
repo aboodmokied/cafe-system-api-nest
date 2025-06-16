@@ -11,7 +11,8 @@ import { getPaginationOptions } from 'src/utils/pagination-options';
 export class SalesPointService {
 
     constructor(
-        @InjectModel(SalesPoint) private salesPointModel:typeof SalesPoint
+        @InjectModel(SalesPoint) private salesPointModel:typeof SalesPoint,
+        @InjectModel(PointBilling) private PointBillingModel:typeof PointBilling,
     ){}
 
         async getSalesPoints(page=1,limit=10){
@@ -28,54 +29,41 @@ export class SalesPointService {
             return {salesPoints,pagination}
         }
     
-        async getSalesPointReport(salesPointId:number,page=1,limit=10){
-            const paginationOptions=getPaginationOptions(page,limit);
-            const salesPoint=await this.salesPointModel.findOne({
-                where: { id:salesPointId },
-                include: [
-                {
-                    model: PointBilling,
-                    ...paginationOptions,
-                    order: [['date', 'DESC']],
+        async getSalesPointReport(pointId:number,page=1,limit=10){
+            const salesPoint = await this.salesPointModel.findOne({
+                    where: { id: pointId },
+                    attributes: {
                     include: [
-                    {
-                        model: Card,
-                        required:true
+                        [
+                            literal(`(
+                                SELECT COALESCE(SUM(totalAmount - paidAmount), 0)
+                                FROM point_billings
+                                WHERE point_billings.pointId = SalesPoint.id AND point_billings.isPaid = false
+                            )`),
+                            'pointTotalAmount',
+                        ],
+                    ],
                     },
-                    ],
-                },
-                ],
-                attributes: {
-                include: [
-                    [
-                        literal(`(
-                            SELECT COALESCE(SUM(totalAmount - paidAmount), 0)
-                            FROM point_billings
-                            WHERE point_billings.pointId = SalesPoint.id AND point_billings.isPaid = false
-                        )`),
-                        'pointTotalAmount',
-                    ],
-                ],
-                },
-                raw: false,
-                subQuery: false,
-            });
-            if(!salesPoint){
-                throw new NotFoundException('sales point not found');
-            }
-            const pointBillingsCount=await salesPoint.getBillingsCount();
-            const totalPages = Math.ceil(pointBillingsCount / limit);
-            return {
-                salesPoint,
-                pagination:{
-                    page,
-                    limit,
-                    totalPages
+                    raw: false,
+                });
+            
+                if(!salesPoint){
+                    throw new NotFoundException('sales point not found');
                 }
+            
+                const {data:pointBillings,pagination}=await this.PointBillingModel.findWithPagination(page,limit,{
+                    where: { pointId },
+                    include: [{ model: Card }],
+                    order: [['date', 'DESC']]
+                });
+                (salesPoint as any).dataValues.pointBillings=pointBillings;
                 
+                return{
+                    salesPoint,
+                    pagination
+                }
             }
-        }
-    
+
         async createSalesPoint(createSalesPointDto:CreateSalesPointDto){
             const count=await this.salesPointModel.count({where:{name:createSalesPointDto.name}});
             if(count){

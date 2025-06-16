@@ -1,11 +1,11 @@
-import { BadRequestException, Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Res, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Res, UseGuards } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { AddCardOrderDto, AddChargingOrderDto, AddOtherOrderDto, GetOrdersDto, StopChargingOrderDto } from './order.dto';
 import { OrderTypes } from 'src/types';
 import { Response } from 'express';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
 @Controller('order')
 export class OrderController {
     constructor(private orderService:OrderService){}
@@ -37,6 +37,13 @@ export class OrderController {
         await this.orderService.stopChargingOrder(stopChargingOrderDto);
         return res.sendStatus(204);
     };
-}
 
-// 2025-05-26 22:07:16 2025-06-02 22:07:16 10
+    @Delete(':id')
+    async deleteOrder(
+        @Res() res:Response,
+        @Param('id',ParseIntPipe) id:number,
+    ){
+        await this.orderService.removeOrder(id);
+        return res.sendStatus(204);
+    }
+}

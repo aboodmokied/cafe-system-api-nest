@@ -43,6 +43,15 @@ export class CardService {
         return null;
     }
 
+    async returnCard(cardId:number){
+        const card=await this.cardModel.findByPk(cardId);
+        if(card){
+            await card.update({qty:++card.qty});
+            return card;
+        }
+        return null;
+    }
+
     async addToStock(addToStockDto:AddToStockDto){
         const card=await this.cardModel.findByPk(addToStockDto.cardId);
         if(!card){

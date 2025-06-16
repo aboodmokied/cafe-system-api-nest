@@ -29,5 +29,7 @@ export class AddOtherOrderDto extends AddOrderDto{
 }
 
 
-
+export class RemoveOrderDto{
+    orderId:number;
+};
 

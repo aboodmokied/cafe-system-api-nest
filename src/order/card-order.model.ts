@@ -17,5 +17,3 @@ export class CardOrder extends Model {
   // price:number;
 
 }
-
-// TODO: When Create A Card Modify this model

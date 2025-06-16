@@ -9,7 +9,10 @@ import { getPaginationOptions } from 'src/utils/pagination-options';
 
 @Injectable()
 export class SupplierService {
-    constructor(@InjectModel(Supplier) private supplierModel:typeof Supplier){}
+    constructor(
+        @InjectModel(Supplier) private supplierModel:typeof Supplier,
+        @InjectModel(SupplierBilling) private supplierBillingModel:typeof SupplierBilling,
+    ){}
 
     async getSuppliers(page=1,limit=10){
         const {data:suppliers,pagination}=await this.supplierModel.findWithPagination(page,limit,{
@@ -26,25 +29,10 @@ export class SupplierService {
     }
 
     async getSupplierReport(supplierId:number,page=1,limit=10){
-        const paginationOptions=getPaginationOptions(page,limit);
-        
-        const supplier= await this.supplierModel.findOne({
-            where: { id:supplierId },
-            include: [
-            {
-                model: SupplierBilling,
-                ...paginationOptions,
-                order: [['date', 'DESC']],
+        const supplier = await this.supplierModel.findOne({
+                where: { id: supplierId },
+                attributes: {
                 include: [
-                {
-                    model: Card,
-                    required:true
-                },
-                ],
-            },
-            ],
-            attributes: {
-            include: [
                 [
                     literal(`(
                         SELECT COALESCE(SUM(totalAmount - paidAmount), 0)
@@ -54,25 +42,26 @@ export class SupplierService {
                     'supplierTotalAmount',
                 ],
             ],
-            },
-            raw: false,
-            subQuery: false,
-        });
-        if(!supplier){
+                },
+                raw: false,
+            });
+        
+          if (!supplier) {
             throw new NotFoundException('supplier not found');
-        }
-        const supplierBillingsCount=await supplier.getBillingsCount();
-        const totalPages = Math.ceil(supplierBillingsCount / limit);
-        return {
-            supplier,
-            pagination:{
-                page,
-                limit,
-                totalPages
+          }
+        
+          const {data:supplierBillings,pagination}=await this.supplierBillingModel.findWithPagination(page,limit,{
+            where: { supplierId },
+            include: [{ model: Card }],
+            order: [['date', 'DESC']]
+          });
+          (supplier as any).dataValues.supplierBillings=supplierBillings;
+            return{
+                supplier,
+                pagination
             }
-            
         }
-    }
+        
 
     async createSupplier(createSupplierDto:CreateSupplierDto){
         const count=await this.supplierModel.count({where:{name:createSupplierDto.name}});

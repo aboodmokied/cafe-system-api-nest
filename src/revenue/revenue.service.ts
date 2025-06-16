@@ -94,15 +94,6 @@ export class RevenueService {
             };
         }
 
-        // const revenues = await this.revenueModel.findAll({
-        //     where: whereClause,
-        //     include: [
-        //     { model: GuestRevenue, required: false },
-        //     { model: SubscriperRevenue, required: false },
-        //     { model: PointRevenue, required: false },
-        //     ],
-        //     order: [['date', 'DESC']],
-        // });
         const {data:revenues,pagination}=await this.revenueModel.findWithPagination(page,limit,{
             where: whereClause,
             include: [

@@ -5,9 +5,11 @@ import { CloseSessionDto, CreateSessionDto } from './session.dto';
 import { BillingService } from 'src/billing/billing.service';
 import { SubscriperService } from 'src/subscriper/subscriper.service';
 import { RevenueService } from 'src/revenue/revenue.service';
-import { col, fn } from 'sequelize';
+import { col, fn, literal } from 'sequelize';
 import { Order } from 'src/order/order.model';
 import { OrderService } from 'src/order/order.service';
+import { ChargingOrder } from 'src/order/charging-order.model';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class SessionService {
@@ -17,7 +19,7 @@ export class SessionService {
         private billingService:BillingService,
         private subscriperService:SubscriperService,
         private revenueService:RevenueService,
-        private orderService:OrderService
+        // private orderService:OrderService
     ){}
 
     async createSession({username,clientType}:CreateSessionDto){
@@ -65,7 +67,20 @@ export class SessionService {
         }else if(!session.isActive){
             throw new BadRequestException('هذه الجلسة مغلقة بالفعل');
         }
-        const activeOrder=await this.orderService.sessionHasActiveChargingOrder(session.id);
+        const activeOrder=await this.orderModel.findOne({
+                    where:{
+                        sessionId:session.id,
+                        type:'CHARGING'
+                    },
+                    include:[
+                        {
+                            model:ChargingOrder,
+                            where:{endAt:null},
+                            required:true
+                        }
+                    ]
+                });
+        console.log({activeOrder});
         if(activeOrder){
             throw new BadRequestException(['الجلسة تحتوي طلب شحن مفتوح قم بإغلاقه كي تقوم بإنهاء الجلسة']);
         }
@@ -73,7 +88,7 @@ export class SessionService {
             // get session total amount
             const result = await this.orderModel.findOne({
                 where: { sessionId:id },
-                attributes: [[fn('SUM', col('price')), 'total']],
+                attributes: [[literal('COALESCE(SUM(price), 0)'), 'total']],
                 raw: true,
             });
             if(!result){
@@ -81,13 +96,15 @@ export class SessionService {
             }
             const amount=parseFloat((result as any).total);
             // record a revenue transaction
-            await this.revenueService.addGuestRevenue({
-                type:'GUEST',
-                amount,
-                sessionId:session.id,
-                username:session.username,
-                date:new Date(),
-            })
+            if(amount>0){
+                await this.revenueService.addGuestRevenue({
+                    type:'GUEST',
+                    amount,
+                    sessionId:session.id,
+                    username:session.username,
+                    date:new Date(),
+                })
+            }
         }
         return session.update({isActive:false,endAt:Date.now()});
     }
@@ -111,5 +128,16 @@ export class SessionService {
             where,
             order: [['createdAt', 'DESC']],
         });
+    }
+
+    async getSessionType(sessionId:number){
+        const session=await this.sessionModel.findOne({
+            where:{id:sessionId},
+            attributes:['clientType']
+        })
+        if(!session){
+            throw new NotFoundException('session not found');
+        }
+        return session.clientType;
     }
 }

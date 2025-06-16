@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Order } from './order.model';
-import { AddCardOrderDto, AddChargingOrderDto, AddOtherOrderDto, GetOrdersDto, StopChargingOrderDto } from './order.dto';
+import { AddCardOrderDto, AddChargingOrderDto, AddOtherOrderDto, GetOrdersDto, RemoveOrderDto, StopChargingOrderDto } from './order.dto';
 import { CardOrder } from './card-order.model';
 import { ChargingOrder } from './charging-order.model';
 import { OtherOrder } from './other-order.model';
@@ -20,8 +20,8 @@ export class OrderService {
     constructor(
         @InjectModel(Order) private orderModel:typeof Order,
         @InjectModel(CardOrder) private cardOrderModel:typeof CardOrder,
-        @InjectModel(ChargingOrder) private chargingOrderMode:typeof ChargingOrder,
-        @InjectModel(OtherOrder) private otherOrderMode:typeof OtherOrder,
+        @InjectModel(ChargingOrder) private chargingOrderModel:typeof ChargingOrder,
+        @InjectModel(OtherOrder) private otherOrderModel:typeof OtherOrder,
         private cardService:CardService,
         private billingService:BillingService,
         private sessionService:SessionService
@@ -39,8 +39,8 @@ export class OrderService {
             where:{sessionId:getOrdersDto.sessionId},
             include: [
                 { model: this.cardOrderModel, required: false },
-                { model: this.chargingOrderMode, required: false },
-                { model: this.otherOrderMode, required: false },
+                { model: this.chargingOrderModel, required: false },
+                { model: this.otherOrderModel, required: false },
             ],
         });
         return orders;
@@ -61,19 +61,18 @@ export class OrderService {
     async addChargingOrder(addOrderDto:AddChargingOrderDto){
         const {sessionId,type}=addOrderDto;
         const order=await this.orderModel.create({sessionId,type});
-        const chargingOrder=await this.chargingOrderMode.create({id:order.id});
+        const chargingOrder=await this.chargingOrderModel.create({id:order.id});
         order.chargingOrder=chargingOrder;
         return order;
     };
     async stopChargingOrder(stopChargingOrderDto:StopChargingOrderDto){
-        console.log({stopChargingOrderDto});
         const {orderId,price,endAt}=stopChargingOrderDto;
         const order=await this.orderModel.findByPk(orderId);
         if(!order){
             throw new NotFoundException('order not found');
         }
         await order.update({price});
-        await this.chargingOrderMode.update({endAt},{where:{id:orderId}});
+        await this.chargingOrderModel.update({endAt},{where:{id:orderId}});
         // update billing
         this.updateBillngIfExist(order.sessionId,order.price,'INC');
         return order;
@@ -81,7 +80,7 @@ export class OrderService {
     async addOtherOrder(addOrderDto:AddOtherOrderDto){
         const {price,sessionId,title,type}=addOrderDto;
         const order=await this.orderModel.create({sessionId,type,price});
-        const otherOrder=await this.otherOrderMode.create({id:order.id,title});
+        const otherOrder=await this.otherOrderModel.create({id:order.id,title});
         order.otherOrder=otherOrder;
         // update billing
         this.updateBillngIfExist(sessionId,order.price,'INC');
@@ -103,6 +102,38 @@ export class OrderService {
             ]
         });
     };
-    async removeOrder(){};
-    async updateOrder(){};
+    async removeOrder(orderId:number){
+        const order=await this.orderModel.findByPk(orderId);
+        if(!order){
+            throw new NotFoundException('order not found');
+        }
+        const sessionType=await this.sessionService.getSessionType(order.sessionId);
+        const {id,sessionId,type}=order;
+        if(type=='CARD'){
+            const cardOrder=await this.cardOrderModel.findByPk(id);
+            if(cardOrder){
+                const {cardId}=cardOrder;
+                await this.cardService.returnCard(cardId);
+                if(sessionType=='SUBSCRIPER'){
+                    this.updateBillngIfExist(sessionId,order.price,'DEC');
+                }
+                await cardOrder.destroy();
+            }
+        }else if(type=='CHARGING'){
+            const chargingOrder=await this.chargingOrderModel.findByPk(id);
+            if(chargingOrder){
+                const {endAt}=chargingOrder;
+                if(sessionType=='SUBSCRIPER'&&endAt){
+                    this.updateBillngIfExist(sessionId,order.price,'DEC');
+                }
+                 await chargingOrder.destroy();  
+            }
+        }else{
+            await this.otherOrderModel.destroy({where:{id:order.id}});
+            if(sessionType=='SUBSCRIPER'){
+                this.updateBillngIfExist(sessionId,order.price,'DEC');
+            }
+        }
+        return order.destroy();
+    };
 }
