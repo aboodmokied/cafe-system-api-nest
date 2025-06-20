@@ -13,9 +13,9 @@ export class AutoUserSeeder implements OnApplicationBootstrap {
   ) {}
 
   async onApplicationBootstrap() {
-    const email = this.config.get<string>('SEED_ADMIN_EMAIL');
-    const password = this.config.get<string>('SEED_ADMIN_PASSWORD');
-    const name = this.config.get<string>('SEED_ADMIN_NAME');
+    const email = this.config.get<string>('SEED_ADMIN_EMAIL') || 'abood@gmail.com';
+    const password = this.config.get<string>('SEED_ADMIN_PASSWORD') || '123456789';
+    const name = this.config.get<string>('SEED_ADMIN_NAME') || 'abood';
 
     if (!email || !password || !name) {
       console.log('⏩ معلومات المستخدم من .env غير مكتملة. تم تخطي seeding.');

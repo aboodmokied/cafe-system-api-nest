@@ -26,7 +26,7 @@ export class Billing extends CustomModel {
   @Column({ type: DataType.DATE, allowNull: false })
   endDate: Date;
 
-  @Column({ type: DataType.ENUM('weekly', 'monthly'), allowNull: false })
+  @Column({ type: DataType.STRING, allowNull: false })
   type: 'weekly' | 'monthly';
 
   @Column({ type: DataType.DOUBLE, defaultValue: 0.0 })

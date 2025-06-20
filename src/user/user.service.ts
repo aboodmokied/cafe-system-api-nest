@@ -13,6 +13,10 @@ export class UserService {
 
     async validateUser(email:string,password:string){
         const user=await this.userModel.findOne({where:{email}})
+        console.log({
+          a:  process.env.JWT_SECRET,
+          b:  process.env.SEED_ADMIN_EMAIL,
+        })
         if(user && bcrypt.compareSync(password,user.password)){
             return user;
         }

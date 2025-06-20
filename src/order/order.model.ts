@@ -14,7 +14,7 @@ export class Order extends Model {
   @Column
   sessionId: number;
 
-  @Column(DataType.ENUM('CARD', 'CHARGING', 'OTHER'))
+  @Column(DataType.STRING)
   type: 'CARD' | 'CHARGING' | 'OTHER';
 
   @Column({type:DataType.DOUBLE,defaultValue:0.0})

@@ -17,25 +17,32 @@ import { SalesPointModule } from './sales-point/sales-point.module';
 import { PointBillingModule } from './point-billing/point-billing.module';
 import { User } from './user/user.model';
 import { AutoUserSeeder } from './seeders/auto-user.seeder';
+import { join } from 'path';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true, // Makes ConfigService available app-wide
     }),
-    SequelizeModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        dialect: configService.get<'postgres' | 'mysql' | 'sqlite'>('DB_DIALECT'),
-        host: configService.get<string>('DB_HOST'),
-        port: configService.get<number>('DB_PORT'),
-        username: configService.get<string>('DB_USERNAME'),
-        password: configService.get<string>('DB_PASSWORD'),
-        database: configService.get<string>('DB_NAME'),
-        autoLoadModels: true,
-        synchronize: true, // Set false in production
-      }),
-      inject: [ConfigService],
+    // SequelizeModule.forRootAsync({
+    //   imports: [ConfigModule],
+    //   useFactory: (configService: ConfigService) => ({
+    //     dialect:"mysql",
+    //     host: "localhost",
+    //     port: 3306,
+    //     username: "root",
+    //     password: "197508",
+    //     database: "cafe-system",
+    //     autoLoadModels: true,
+    //     synchronize: true, // Set false in production
+    //   }),
+    //   inject: [ConfigService],
+    // }),
+    SequelizeModule.forRoot({
+      dialect: 'sqlite',
+      storage: process.env.DB_STORAGE || join(__dirname,'..', 'data', 'database.sqlite'),
+      autoLoadModels: true,
+      synchronize: true, // لا تنسى إلغاءه في الإنتاج
     }),
     UserModule,
     SequelizeModule.forFeature([User]),

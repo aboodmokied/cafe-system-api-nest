@@ -32,7 +32,7 @@ export class Session extends CustomModel {
   
 
   @Column({
-    type: DataType.ENUM('GUEST', 'SUBSCRIPER'),
+    type: DataType.STRING,
     allowNull:false
   })
   clientType:string

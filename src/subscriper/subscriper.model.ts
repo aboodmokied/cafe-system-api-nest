@@ -30,7 +30,7 @@ export class Subscriper extends CustomModel{
   phone: string;
 
   @Column({
-    type: DataType.ENUM('weekly', 'monthly'),
+    type: DataType.STRING,
     allowNull: false,
   })
   type: 'monthly'|'weekly';

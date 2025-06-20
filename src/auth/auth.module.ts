@@ -22,9 +22,9 @@ import { Token } from './token.model';
     JwtModule.registerAsync({
       imports:[ConfigModule],
       useFactory:async(configService:ConfigService)=>({
-        secret:configService.get<string>('JWT_SECRET'),
+        secret:configService.get<string>('JWT_SECRET') || 'abood',
         signOptions:{
-          expiresIn:configService.get<string>('JWT_EXPIRATION'),
+          expiresIn:configService.get<string>('JWT_EXPIRATION') || '1d',
         },
       }),
       inject:[ConfigService]
