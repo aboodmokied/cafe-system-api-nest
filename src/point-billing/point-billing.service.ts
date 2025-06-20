@@ -71,7 +71,7 @@ export class PointBillingService {
           });
         
           const totalAmountResult = await this.pointBillingModel.findOne({
-            attributes: [[sequelize.literal('SUM(`totalAmount` - `paidAmount`)'), 'totalAmount']],
+            attributes: [[sequelize.literal('SUM("totalAmount" - "paidAmount")'), 'totalAmount']],
             where: {
               isPaid: false,
             },

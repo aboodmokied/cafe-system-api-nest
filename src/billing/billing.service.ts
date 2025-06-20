@@ -120,7 +120,7 @@ async getCollectionBillings(page = 1, limit = 10) {
   });
 
   const totalAmountResult = await this.billingModel.findOne({
-    attributes: [[sequelize.literal('SUM(`totalAmount` - `paidAmount`)'), 'totalAmount']],
+    attributes: [[sequelize.literal('SUM("totalAmount" - "paidAmount")'), 'totalAmount']],
     where: {
       isPaid: false,
       endDate: { [Op.lte]: now },

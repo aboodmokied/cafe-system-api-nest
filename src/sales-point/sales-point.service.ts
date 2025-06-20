@@ -36,9 +36,9 @@ export class SalesPointService {
                     include: [
                         [
                             literal(`(
-                                SELECT COALESCE(SUM(totalAmount - paidAmount), 0)
-                                FROM point_billings
-                                WHERE point_billings.pointId = SalesPoint.id AND point_billings.isPaid = false
+                                SELECT COALESCE(SUM("point_billings"."totalAmount" - "point_billings"."paidAmount"), 0)
+                                FROM "point_billings"
+                                WHERE "point_billings"."pointId" = "SalesPoint"."id" AND "point_billings"."isPaid" = false
                             )`),
                             'pointTotalAmount',
                         ],

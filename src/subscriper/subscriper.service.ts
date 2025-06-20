@@ -57,10 +57,10 @@ export class SubscriperService {
         include: [
             [
             literal(`(
-                SELECT COALESCE(SUM(totalAmount - paidAmount), 0)
-                FROM billings
-                WHERE billings.subscriperId = Subscriper.id AND billings.isPaid = false
-            )`),
+                SELECT COALESCE(SUM("billings"."totalAmount" - "billings"."paidAmount"), 0)
+                FROM "billings"
+                WHERE "billings"."subscriperId" = "Subscriper"."id" AND "billings"."isPaid" = false
+                )`),
             'subscriperTotalAmount',
             ],
         ],

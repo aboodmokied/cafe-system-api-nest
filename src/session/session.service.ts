@@ -88,7 +88,7 @@ export class SessionService {
             // get session total amount
             const result = await this.orderModel.findOne({
                 where: { sessionId:id },
-                attributes: [[literal('COALESCE(SUM(price), 0)'), 'total']],
+                attributes: [[literal('COALESCE(SUM("price"), 0)'), 'total']],
                 raw: true,
             });
             if(!result){

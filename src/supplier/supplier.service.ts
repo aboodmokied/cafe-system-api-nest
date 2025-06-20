@@ -35,9 +35,9 @@ export class SupplierService {
                 include: [
                 [
                     literal(`(
-                        SELECT COALESCE(SUM(totalAmount - paidAmount), 0)
-                        FROM supplier_billings
-                        WHERE supplier_billings.supplierId = Supplier.id AND supplier_billings.isPaid = false
+                        SELECT COALESCE(SUM("supplier_billings"."totalAmount" - "supplier_billings"."paidAmount"), 0)
+                        FROM "supplier_billings"
+                        WHERE "supplier_billings"."supplierId" = "Supplier"."id" AND "supplier_billings"."isPaid" = false
                     )`),
                     'supplierTotalAmount',
                 ],

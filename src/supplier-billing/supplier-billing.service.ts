@@ -69,7 +69,7 @@ export class SupplierBillingService {
             });
         
             const totalAmountResult = await this.supplierBillingModel.findOne({
-            attributes: [[sequelize.literal('SUM(`totalAmount` - `paidAmount`)'), 'totalAmount']],
+            attributes: [[sequelize.literal('SUM("totalAmount" - "paidAmount")'), 'totalAmount']],
             where: {
                 isPaid: false,
             },
